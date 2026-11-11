@@ -10,7 +10,7 @@ com.google.firebase.messaging.FirebaseMessaging
   OK    boolean isAutoInitEnabled()
   UNAV  boolean isNotificationDelegationEnabled()  [deprecated: Notification delegation (proxy notifications) is an Android feature with no counterpart in the Firebase iOS and JS SDKs; a call belongs in androidMain]
   OMIT  Task register()  [deprecated: register() and unregister() were added to the Firebase Android SDK after firebase-messaging 25.1.2, the version this SDK depends on, and are not available yet]
-  SKIP  void send(RemoteMessage)
+  SKIP  void send(RemoteMessage)  [deprecated: Upstream messaging through Firebase Cloud Messaging was decommissioned in June 2024 and send() is Android-only; send messages from your own backend]
   OK    void setAutoInitEnabled(boolean)
   UNAV  void setDeliveryMetricsExportToBigQuery(boolean)  [deprecated: Exporting delivery metrics to BigQuery is an Android SDK setting with no counterpart in the Firebase iOS and JS SDKs, which configure it on their own side; a call belongs in androidMain]
   UNAV  Task setNotificationDelegationEnabled(boolean)  [deprecated: Notification delegation (proxy notifications) is an Android feature with no counterpart in the Firebase iOS and JS SDKs; a call belongs in androidMain]
@@ -34,7 +34,7 @@ com.google.firebase.messaging.RemoteMessage
   OK    long getSentTime()
   SKIP  String getTo()
   OK    int getTtl()
-  PLAT  void writeToParcel(Parcel, int)
+  PLAT  void writeToParcel(Parcel, int)  [deprecated: writeToParcel implements android.os.Parcelable, which is Android-only; a RemoteMessage is rebuilt with RemoteMessage.Builder on every platform]
   OK    static int PRIORITY_HIGH
   OK    static int PRIORITY_NORMAL
   OK    static int PRIORITY_UNKNOWN

@@ -6,6 +6,8 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_EXECUTOR_JVM_ONLY
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
 import com.google.android.gms.tasks.OnCompleteListener
@@ -70,6 +72,14 @@ public actual abstract class LoadBundleTask internal constructor() : Task<LoadBu
         registerProgressListener(listener)
         return this
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = throw UnsupportedOperationException(PROGRESS_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = throw UnsupportedOperationException(PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY)
 
     internal abstract fun registerProgressListener(listener: OnProgressListener<LoadBundleTaskProgress>)
 }

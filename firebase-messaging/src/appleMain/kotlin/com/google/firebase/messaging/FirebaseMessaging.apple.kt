@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
 import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
 import dev.gitlive.firebase.messaging.REGISTER_NOT_AVAILABLE
@@ -16,6 +17,9 @@ import platform.Foundation.NSError
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class FirebaseMessaging internal constructor(public val ios: FIRMessaging) {
     public actual fun deleteToken(): Task<Nothing?> = task { completion -> ios.deleteTokenWithCompletion { error -> completion(null, error) } }
+
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public actual fun send(message: RemoteMessage): Unit = throw UnsupportedOperationException(UPSTREAM_SEND_DECOMMISSIONED)
 
     public actual fun getToken(): Task<String> = task { completion ->
         ios.tokenWithCompletion { token, error -> completion(token ?: "", error) }

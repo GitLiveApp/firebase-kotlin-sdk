@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.FROM_ERROR_STATUS_ANDROID_ONLY
 import com.google.firebase.FirebaseException
 
 /** An error of Cloud Storage, as the Android SDK's `StorageException`; [errorCode] is one of the `ERROR_*` constants. */
@@ -38,5 +39,10 @@ public expect open class StorageException : FirebaseException {
 
         /** [exception] as a [StorageException] with the error code of [httpResultCode], or null if [exception] is null and the status is a success. */
         public fun fromExceptionAndHttpCode(exception: Throwable?, httpResultCode: Int): StorageException?
+
+        /** Android only: the [StorageException] of a Play Services `Status`. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(FROM_ERROR_STATUS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public fun fromErrorStatus(status: com.google.android.gms.common.api.Status): StorageException
     }
 }

@@ -21,3 +21,9 @@ internal const val STREAM_JVM_ONLY =
 internal const val WITH_TIMEOUT_JVM_ONLY =
     "withTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; " +
         "use withTimeout(timeout) with a kotlin.time.Duration from common code"
+
+internal const val PUBLISHER_JVM_ONLY =
+    "org.reactivestreams.Publisher is JVM-only and only stands in for HttpsCallableReference.stream(), which is not available in common code"
+
+internal const val USE_FUNCTIONS_EMULATOR_DEPRECATED =
+    "Deprecated in the Firebase Android SDK; use useEmulator(host, port). The origin is parsed into them here."

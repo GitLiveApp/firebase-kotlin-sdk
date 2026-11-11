@@ -1,4 +1,5 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-storage.
+# @platform members are declared in common code through error-deprecated stand-ins for the Android/JVM type (android.app.Activity, java.util.concurrent.Executor, android.os.Parcel, ...), so common code gets a message naming the type rather than an unresolved reference; they are not counted.
 com.google.firebase.storage.StreamDownloadTask*  // @platform streams to a java.io.InputStream (JVM-only)
 com.google.firebase.storage.StorageReference#getStream  // @platform returns a StreamDownloadTask (java.io.InputStream)
 com.google.firebase.storage.StorageKt#component1(StreamDownloadTask.TaskSnapshot)  // @platform java.io.InputStream

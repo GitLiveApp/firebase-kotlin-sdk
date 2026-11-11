@@ -65,16 +65,16 @@ com.google.firebase.functions.HttpsCallableReference
   OK    Task call(Object)
   OK    long getTimeout()
   MAP   void setTimeout(long, TimeUnit)  [deprecated: setTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; use setTimeout(timeout) with a kotlin.time.Duration from common code]
-  PLAT  Publisher stream()
-  PLAT  Publisher stream(Object)
+  PLAT  Publisher stream()  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]
+  PLAT  Publisher stream(Object)  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]
   MAP   HttpsCallableReference withTimeout(long, TimeUnit)  [deprecated: withTimeout(Long, TimeUnit) takes a java.util.concurrent.TimeUnit and can only be called from Android/JVM code; use withTimeout(timeout) with a kotlin.time.Duration from common code]
 com.google.firebase.functions.HttpsCallableResult
   OK    Object getData()
   MAP   Object data  [property getData()]
 com.google.firebase.functions.StreamResponse  (class omitted)
 com.google.firebase.functions.StreamResponse.Message  (class omitted)
-  OMIT  Message(HttpsCallableResult)
-  OMIT  HttpsCallableResult getMessage()
+  OMIT  Message(HttpsCallableResult)  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]
+  OMIT  HttpsCallableResult getMessage()  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]
 com.google.firebase.functions.StreamResponse.Result  (class omitted)
-  OMIT  Result(HttpsCallableResult)
-  OMIT  HttpsCallableResult getResult()
+  OMIT  Result(HttpsCallableResult)  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]
+  OMIT  HttpsCallableResult getResult()  [deprecated: Streaming callables are not available in common code: HttpsCallableReference.stream() returns an org.reactivestreams.Publisher, which is JVM-only, and the Firebase iOS SDK's streaming API is Swift-only; a call belongs in androidMain]

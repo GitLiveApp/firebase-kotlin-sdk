@@ -1,4 +1,5 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-messaging.
+# @platform members are declared in common code through error-deprecated stand-ins for the Android/JVM type (android.app.Activity, java.util.concurrent.Executor, android.os.Parcel, ...), so common code gets a message naming the type rather than an unresolved reference; they are not counted.
 com.google.firebase.messaging.FirebaseMessagingService  // @platform an android.app.Service: received messages are handled by platform code on every platform
 com.google.firebase.messaging.FirebaseMessaging#register  // added after firebase-messaging 25.1.2, the version this SDK depends on
 com.google.firebase.messaging.FirebaseMessaging#unregister  // added after firebase-messaging 25.1.2, the version this SDK depends on

@@ -4,6 +4,9 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.CACHE_API_MIXED
+import dev.gitlive.firebase.firestore.DEPRECATED_CACHE_API_MIXED
+import dev.gitlive.firebase.firestore.PERSISTENCE_SETTINGS_DEPRECATED
 import dev.gitlive.firebase.firestore.internal.CACHE_SIZE_UNLIMITED
 import dev.gitlive.firebase.firestore.internal.DEFAULT_CACHE_SIZE_BYTES
 import dev.gitlive.firebase.firestore.internal.DEFAULT_GRPC_FLOW_CONTROL_WINDOW
@@ -26,6 +29,12 @@ public actual class FirebaseFirestoreSettings private constructor(
 
     override fun toString(): String = "FirebaseFirestoreSettings{host=$host, sslEnabled=$isSslEnabled, cacheSettings=$cacheSettings, grpcFlowControlWindow=$grpcFlowControlWindow}"
 
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings !is MemoryCacheSettings"))
+    public actual val isPersistenceEnabled: Boolean get() = cacheSettings !is MemoryCacheSettings
+
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings"))
+    public actual val cacheSizeBytes: Long get() = cacheSettings?.sizeBytesOrDefault ?: DEFAULT_CACHE_SIZE_BYTES
+
     public actual companion object {
         public actual val CACHE_SIZE_UNLIMITED: Long = dev.gitlive.firebase.firestore.internal.CACHE_SIZE_UNLIMITED
         public actual val DEFAULT_GRPC_FLOW_CONTROL_WINDOW: Int = dev.gitlive.firebase.firestore.internal.DEFAULT_GRPC_FLOW_CONTROL_WINDOW
@@ -36,6 +45,12 @@ public actual class FirebaseFirestoreSettings private constructor(
         public actual var isSslEnabled: Boolean
         public actual var grpcFlowControlWindow: Int
         private var cacheSettings: LocalCacheSettings?
+
+        // The deprecated cache API, which builds the cache settings on build(); the SDK rejects mixing the two APIs.
+        private var usedDeprecatedCacheApi = false
+        private var usedCacheSettingsApi = false
+        private var persistenceEnabled = true
+        private var deprecatedCacheSizeBytes = DEFAULT_CACHE_SIZE_BYTES
 
         public actual constructor() {
             host = DEFAULT_HOST
@@ -55,11 +70,43 @@ public actual class FirebaseFirestoreSettings private constructor(
 
         public actual fun setSslEnabled(value: Boolean): Builder = apply { isSslEnabled = value }
 
-        public actual fun setLocalCacheSettings(cacheSettings: LocalCacheSettings): Builder = apply { this.cacheSettings = cacheSettings }
+        public actual fun setLocalCacheSettings(cacheSettings: LocalCacheSettings): Builder = apply {
+            check(!usedDeprecatedCacheApi) { DEPRECATED_CACHE_API_MIXED }
+            usedCacheSettingsApi = true
+            this.cacheSettings = cacheSettings
+        }
 
         public actual fun setGrpcFlowControlWindow(grpcFlowControlWindow: Int): Builder = apply { this.grpcFlowControlWindow = grpcFlowControlWindow }
 
-        public actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(host, isSslEnabled, cacheSettings, grpcFlowControlWindow)
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual val isPersistenceEnabled: Boolean get() = if (usedDeprecatedCacheApi) persistenceEnabled else cacheSettings !is MemoryCacheSettings
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual val cacheSizeBytes: Long get() = if (usedDeprecatedCacheApi) deprecatedCacheSizeBytes else cacheSettings?.sizeBytesOrDefault ?: DEFAULT_CACHE_SIZE_BYTES
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual fun setPersistenceEnabled(value: Boolean): Builder = apply {
+            check(!usedCacheSettingsApi) { CACHE_API_MIXED }
+            usedDeprecatedCacheApi = true
+            persistenceEnabled = value
+        }
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual fun setCacheSizeBytes(value: Long): Builder = apply {
+            check(!usedCacheSettingsApi) { CACHE_API_MIXED }
+            requireCacheSize(value)
+            usedDeprecatedCacheApi = true
+            deprecatedCacheSizeBytes = value
+        }
+
+        /** The cache the deprecated API describes: persistent with its size, or in memory with the SDK's default (eager) collection. */
+        private fun deprecatedCacheSettings(): LocalCacheSettings = if (persistenceEnabled) {
+            PersistentCacheSettings.newBuilder().setSizeBytes(deprecatedCacheSizeBytes).build()
+        } else {
+            MemoryCacheSettings.newBuilder().build()
+        }
+
+        public actual fun build(): FirebaseFirestoreSettings = FirebaseFirestoreSettings(host, isSslEnabled, if (usedDeprecatedCacheApi) deprecatedCacheSettings() else cacheSettings, grpcFlowControlWindow)
     }
 }
 

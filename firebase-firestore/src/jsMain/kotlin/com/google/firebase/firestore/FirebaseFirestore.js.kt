@@ -4,6 +4,9 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.INDEX_CONFIGURATION_DEPRECATED
+import dev.gitlive.firebase.firestore.LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTENER_EXECUTOR_JVM_ONLY
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_BUFFER_ANDROID_ONLY
 import com.google.firebase.FirebaseApp
@@ -115,6 +118,17 @@ public actual class FirebaseFirestore private constructor(private val jsApp: JsF
         val unsubscribe = rethrow { onSnapshotsInSync(js) { runnable.run() } }
         return ListenerRegistration { rethrow { unsubscribe() } }
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotsInSyncListener(executor: java.util.concurrent.Executor, runnable: Runnable): ListenerRegistration = throw UnsupportedOperationException(LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotsInSyncListener(activity: android.app.Activity, runnable: Runnable): ListenerRegistration = throw UnsupportedOperationException(LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Deprecated(INDEX_CONFIGURATION_DEPRECATED, ReplaceWith("persistentCacheIndexManager?.enableIndexAutoCreation()"), DeprecationLevel.ERROR)
+    public actual fun setIndexConfiguration(json: String): Task<Nothing?> = throw UnsupportedOperationException(INDEX_CONFIGURATION_DEPRECATED)
 
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = loadBundle { jsLoadBundle(js, bundleData.toUint8Array().buffer) }
 

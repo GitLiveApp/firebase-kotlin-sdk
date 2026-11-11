@@ -15,9 +15,19 @@ import dev.gitlive.firebase.functions.STREAM_JVM_ONLY
 public abstract class StreamResponse private constructor() {
     /** A message streamed before the result. */
     @Suppress("DEPRECATION_ERROR")
-    public class Message private constructor() : StreamResponse()
+    public class Message
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    constructor(
+        @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+        public val message: HttpsCallableResult,
+    ) : StreamResponse()
 
     /** The final result of the call. */
     @Suppress("DEPRECATION_ERROR")
-    public class Result private constructor() : StreamResponse()
+    public class Result
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    constructor(
+        @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+        public val result: HttpsCallableResult,
+    ) : StreamResponse()
 }

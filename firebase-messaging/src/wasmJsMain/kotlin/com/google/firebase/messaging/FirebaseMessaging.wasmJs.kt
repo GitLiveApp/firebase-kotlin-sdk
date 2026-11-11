@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.FirebaseException
@@ -25,6 +26,9 @@ import dev.gitlive.firebase.messaging.externals.getToken as jsGetToken
 /** @property js The underlying Firebase JS SDK object. */
 public actual class FirebaseMessaging internal constructor(public val js: Messaging) {
     public actual fun deleteToken(): Task<Nothing?> = task({ jsDeleteToken(js) }) { null }
+
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public actual fun send(message: RemoteMessage): Unit = throw UnsupportedOperationException(UPSTREAM_SEND_DECOMMISSIONED)
 
     public actual fun getToken(): Task<String> = task({ jsGetToken(js) }) { it.toKotlinString() }
 

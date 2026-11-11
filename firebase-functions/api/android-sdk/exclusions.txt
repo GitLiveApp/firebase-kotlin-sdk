@@ -1,3 +1,4 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-functions.
+# @platform members are declared in common code through error-deprecated stand-ins for the Android/JVM type (android.app.Activity, java.util.concurrent.Executor, android.os.Parcel, ...), so common code gets a message naming the type rather than an unresolved reference; they are not counted.
 com.google.firebase.functions.HttpsCallableReference#stream  // @platform returns an org.reactivestreams.Publisher (JVM-only); the iOS SDK's streaming API is Swift-only
 com.google.firebase.functions.StreamResponse  // only produced by stream(), see above

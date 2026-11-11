@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.STREAM_DOWNLOAD_JVM_ONLY
 import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
 
 import android.net.Uri
@@ -97,6 +98,14 @@ public actual class StorageReference internal constructor(public val ios: FIRSto
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public actual fun getFile(destinationFile: java.io.File): FileDownloadTask = throw UnsupportedOperationException(GET_FILE_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public actual fun getStream(): StreamDownloadTask = throw UnsupportedOperationException(STREAM_DOWNLOAD_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public actual fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask = throw UnsupportedOperationException(STREAM_DOWNLOAD_JVM_ONLY)
 
     internal fun getFileAt(destination: Path): FileDownloadTask = FileDownloadTaskImpl(this, ios.writeToFile(NSURL.fileURLWithPath(destination.toString())))
 

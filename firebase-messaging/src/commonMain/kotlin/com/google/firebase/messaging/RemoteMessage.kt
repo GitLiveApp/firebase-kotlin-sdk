@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.WRITE_TO_PARCEL_ANDROID_ONLY
 import android.net.Uri
 /**
  * A message received from, or (with [Builder]) sent to, Firebase Cloud Messaging, as the Android SDK's `RemoteMessage`.
@@ -48,6 +49,11 @@ public expect class RemoteMessage {
 
     /** The time to live in seconds. */
     public val ttl: Int
+
+    /** Android only: `Parcelable.writeToParcel`. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(WRITE_TO_PARCEL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun writeToParcel(dest: android.os.Parcel, flags: Int)
 
     /** Builds a [RemoteMessage] addressed to [to]. */
     public class Builder {

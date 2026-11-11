@@ -1,4 +1,5 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-firestore.
+# @platform members are declared in common code through error-deprecated stand-ins for the Android/JVM type (android.app.Activity, java.util.concurrent.Executor, android.os.Parcel, ...), so common code gets a message naming the type rather than an unresolved reference; they are not counted.
 
 # The bundle result by class is Android-only (the task's result is the progress itself).
 com.google.firebase.firestore.LoadBundleTask#getResult(Class)  // @platform java.lang.Class

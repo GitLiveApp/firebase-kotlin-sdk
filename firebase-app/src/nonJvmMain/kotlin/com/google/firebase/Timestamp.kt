@@ -6,6 +6,7 @@ package com.google.firebase
 
 import dev.gitlive.firebase.TIMESTAMP_OF_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TIMESTAMP_OF_INSTANT_ANDROID_ONLY
+import dev.gitlive.firebase.TIMESTAMP_PARCELABLE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_INSTANT_ANDROID_ONLY
 
@@ -46,6 +47,14 @@ public actual class Timestamp actual constructor(
     @Deprecated(TO_INSTANT_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
     public actual fun toInstant(): java.time.Instant = throw UnsupportedOperationException(TO_INSTANT_ANDROID_ONLY)
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun describeContents(): Int = throw UnsupportedOperationException(TIMESTAMP_PARCELABLE_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = throw UnsupportedOperationException(TIMESTAMP_PARCELABLE_ANDROID_ONLY)
+
     override fun equals(other: Any?): Boolean = other is Timestamp && other.seconds == seconds && other.nanoseconds == nanoseconds
 
     override fun hashCode(): Int = 31 * seconds.hashCode() + nanoseconds
@@ -57,6 +66,10 @@ public actual class Timestamp actual constructor(
             val millis = currentTimeMillis()
             return Timestamp(millis.floorDiv(1000), millis.mod(1000L).toInt() * NANOS_PER_MILLISECOND)
         }
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual val CREATOR: android.os.Parcelable.Creator<Timestamp> get() = throw UnsupportedOperationException(TIMESTAMP_PARCELABLE_ANDROID_ONLY)
     }
 }
 

@@ -4,6 +4,8 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTENER_EXECUTOR_JVM_ONLY
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRAggregateField
 import dev.gitlive.firebase.firestore.REFLECTIVE_ADD
 import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
@@ -113,6 +115,22 @@ public actual open class Query internal constructor(public open val ios: FIRQuer
         val registration = ios.addSnapshotListenerWithOptions(options.toIos(), listener.toIos())
         return ListenerRegistration { registration.remove() }
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, listener: EventListener<QuerySnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, listener: EventListener<QuerySnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_ACTIVITY_ANDROID_ONLY)
 
     private fun EventListener<QuerySnapshot>.toIos(): (FIRQuerySnapshot?, NSError?) -> Unit = { snapshot, error ->
         onEvent(snapshot?.let { QuerySnapshot(it) }, error?.toFirestoreException())
@@ -224,6 +242,22 @@ public actual class DocumentReference internal constructor(public val ios: FIRDo
         val registration = ios.addSnapshotListenerWithOptions(options.toIos(), listener.toIos())
         return ListenerRegistration { registration.remove() }
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, listener: EventListener<DocumentSnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, listener: EventListener<DocumentSnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = throw UnsupportedOperationException(LISTENER_ACTIVITY_ANDROID_ONLY)
 
     private fun EventListener<DocumentSnapshot>.toIos(): (FIRDocumentSnapshot?, NSError?) -> Unit = { snapshot, error ->
         onEvent(snapshot?.let { DocumentSnapshot(it) }, error?.toFirestoreException())

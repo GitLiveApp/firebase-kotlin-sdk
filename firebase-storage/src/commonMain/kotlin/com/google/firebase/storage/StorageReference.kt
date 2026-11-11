@@ -4,6 +4,7 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.STREAM_DOWNLOAD_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
@@ -103,6 +104,16 @@ public expect class StorageReference : Comparable<StorageReference> {
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public fun getFile(destinationFile: java.io.File): FileDownloadTask
+
+    /** Android/JVM only: downloads to a `java.io.InputStream`; common code uses [getBytes], `getFile(Path)` or [getFile]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public fun getStream(): StreamDownloadTask
+
+    /** Android/JVM only: downloads to a `java.io.InputStream` read by [processor]; common code uses [getBytes], `getFile(Path)` or [getFile]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask
 
     /** The downloads from this reference that have not completed; always empty on JS. */
     public val activeDownloadTasks: List<FileDownloadTask>

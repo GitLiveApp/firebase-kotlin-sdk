@@ -8,6 +8,7 @@ public final class com/google/firebase/messaging/FirebaseMessaging {
 	public final fun isAutoInitEnabled ()Z
 	public final fun isNotificationDelegationEnabled ()Z
 	public final fun register ()Lcom/google/android/gms/tasks/Task;
+	public final fun send (Lcom/google/firebase/messaging/RemoteMessage;)V
 	public final fun setAutoInitEnabled (Z)V
 	public final fun setDeliveryMetricsExportToBigQuery (Z)V
 	public final fun setNotificationDelegationEnabled (Z)Lcom/google/android/gms/tasks/Task;
@@ -50,6 +51,7 @@ public final class com/google/firebase/messaging/RemoteMessage {
 	public final fun getTtl ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/google/firebase/messaging/RemoteMessage$Builder {

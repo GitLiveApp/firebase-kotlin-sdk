@@ -209,7 +209,7 @@ tasks.withType<JavaCompile>().configureEach {
 
 // The com.google.* declarations are header stubs on Android/JVM (see buildSrc utils/HeaderStubs.kt).
 stripHeaderStubs(
-    packageDirs = listOf("com/google/firebase"),
+    packageDirs = listOf("com/google/firebase", "org/reactivestreams"),
     androidReferenceJars = files({
         configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")

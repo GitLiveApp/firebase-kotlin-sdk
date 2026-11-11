@@ -4,12 +4,18 @@
 
 package com.google.firebase.firestore
 
+import dev.gitlive.firebase.firestore.LISTEN_OPTIONS_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTEN_OPTIONS_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.firestore.PERSISTENCE_SETTINGS_DEPRECATED
+
 /**
  * The settings of a [FirebaseFirestore], mirroring `com.google.firebase.firestore.FirebaseFirestoreSettings` from the
  * Firebase Android SDK: built with [Builder] (or the `firestoreSettings` extension) and applied with
  * `FirebaseFirestore.firestoreSettings` before the instance is used.
  *
- * Not mirrored: the deprecated `persistenceEnabled` and `cacheSizeBytes`; use [Builder.setLocalCacheSettings].
+ * The deprecated `persistenceEnabled` and `cacheSizeBytes` are mirrored, deprecated as in the SDK, as a view of the cache
+ * settings: setting them builds [PersistentCacheSettings] or [MemoryCacheSettings], and they cannot be mixed with
+ * [Builder.setLocalCacheSettings], as in the SDK.
  */
 public expect class FirebaseFirestoreSettings {
     /** The backend host. */
@@ -23,6 +29,14 @@ public expect class FirebaseFirestoreSettings {
 
     /** The gRPC flow control window in bytes. */
     public val grpcFlowControlWindow: Int
+
+    /** Whether the local cache is persistent: [cacheSettings] is not [MemoryCacheSettings]. */
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings !is MemoryCacheSettings"))
+    public val isPersistenceEnabled: Boolean
+
+    /** The size of the persistent or LRU cache, or the SDK's default when [cacheSettings] has none. */
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings"))
+    public val cacheSizeBytes: Long
 
     public companion object {
         /** A cache size that disables garbage collection. */
@@ -49,6 +63,22 @@ public expect class FirebaseFirestoreSettings {
         public fun setSslEnabled(value: Boolean): Builder
         public fun setLocalCacheSettings(cacheSettings: LocalCacheSettings): Builder
         public fun setGrpcFlowControlWindow(grpcFlowControlWindow: Int): Builder
+
+        /** Whether the cache built is persistent. */
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public val isPersistenceEnabled: Boolean
+
+        /** The size of the cache built. */
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public val cacheSizeBytes: Long
+
+        /** Builds a [PersistentCacheSettings] (`true`) or [MemoryCacheSettings] (`false`) cache; cannot follow [setLocalCacheSettings]. */
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public fun setPersistenceEnabled(value: Boolean): Builder
+
+        /** The size of the [PersistentCacheSettings] or LRU [MemoryCacheSettings] cache built; cannot follow [setLocalCacheSettings]. */
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public fun setCacheSizeBytes(value: Long): Builder
         public fun build(): FirebaseFirestoreSettings
     }
 }
@@ -130,9 +160,29 @@ public class SnapshotListenOptions private constructor(
 
     override fun toString(): String = "SnapshotListenOptions{metadataChanges=$metadataChanges, source=$source}"
 
+    /** Android only: the Activity the listener is scoped to; always unset off Android. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTEN_OPTIONS_ACTIVITY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val activity: android.app.Activity? get() = throw UnsupportedOperationException(LISTEN_OPTIONS_ACTIVITY_ANDROID_ONLY)
+
+    /** JVM only: the Executor the listener is called on. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTEN_OPTIONS_EXECUTOR_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public val executor: java.util.concurrent.Executor get() = throw UnsupportedOperationException(LISTEN_OPTIONS_EXECUTOR_JVM_ONLY)
+
     public class Builder {
         private var metadataChanges = MetadataChanges.EXCLUDE
         private var source = ListenSource.DEFAULT
+
+        /** Android only: scopes the listener to [activity]. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(LISTEN_OPTIONS_ACTIVITY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public fun setActivity(activity: android.app.Activity): Builder = throw UnsupportedOperationException(LISTEN_OPTIONS_ACTIVITY_ANDROID_ONLY)
+
+        /** JVM only: calls the listener on [executor]. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(LISTEN_OPTIONS_EXECUTOR_JVM_ONLY, level = DeprecationLevel.ERROR)
+        public fun setExecutor(executor: java.util.concurrent.Executor): Builder = throw UnsupportedOperationException(LISTEN_OPTIONS_EXECUTOR_JVM_ONLY)
 
         public fun setMetadataChanges(metadataChanges: MetadataChanges): Builder {
             this.metadataChanges = metadataChanges

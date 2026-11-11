@@ -8,6 +8,9 @@ import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlin.coroutines.cancellation.CancellationException
 import dev.gitlive.firebase.GET_RESULT_CLASS_JVM_ONLY
+import dev.gitlive.firebase.TASK_CONTINUATION_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.TASK_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.TASK_LISTENER_EXECUTOR_JVM_ONLY
 
 public actual abstract class Task<TResult> actual constructor() {
     public actual abstract val isComplete: Boolean
@@ -26,6 +29,50 @@ public actual abstract class Task<TResult> actual constructor() {
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(GET_RESULT_CLASS_JVM_ONLY, ReplaceWith("result"), DeprecationLevel.ERROR)
     public actual fun <X : Throwable> getResult(exceptionType: java.lang.Class<X>): TResult = throw UnsupportedOperationException(GET_RESULT_CLASS_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnSuccessListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnSuccessListener(executor: java.util.concurrent.Executor, listener: OnSuccessListener<TResult>): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnSuccessListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnSuccessListener(activity: android.app.Activity, listener: OnSuccessListener<TResult>): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnFailureListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnFailureListener(executor: java.util.concurrent.Executor, listener: OnFailureListener): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnFailureListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnFailureListener(activity: android.app.Activity, listener: OnFailureListener): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnCompleteListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnCompleteListener(executor: java.util.concurrent.Executor, listener: OnCompleteListener<TResult>): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnCompleteListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnCompleteListener(activity: android.app.Activity, listener: OnCompleteListener<TResult>): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnCanceledListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnCanceledListener(executor: java.util.concurrent.Executor, listener: OnCanceledListener): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnCanceledListener(listener)"), DeprecationLevel.ERROR)
+    public actual open fun addOnCanceledListener(activity: android.app.Activity, listener: OnCanceledListener): Task<TResult> = throw UnsupportedOperationException(TASK_LISTENER_ACTIVITY_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_CONTINUATION_EXECUTOR_JVM_ONLY, ReplaceWith("continueWith(continuation)"), DeprecationLevel.ERROR)
+    public actual open fun <TContinuationResult> continueWith(executor: java.util.concurrent.Executor, continuation: Continuation<TResult, TContinuationResult>): Task<TContinuationResult> = throw UnsupportedOperationException(TASK_CONTINUATION_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_CONTINUATION_EXECUTOR_JVM_ONLY, ReplaceWith("continueWithTask(continuation)"), DeprecationLevel.ERROR)
+    public actual open fun <TContinuationResult> continueWithTask(executor: java.util.concurrent.Executor, continuation: Continuation<TResult, Task<TContinuationResult>>): Task<TContinuationResult> = throw UnsupportedOperationException(TASK_CONTINUATION_EXECUTOR_JVM_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_CONTINUATION_EXECUTOR_JVM_ONLY, ReplaceWith("onSuccessTask(successContinuation)"), DeprecationLevel.ERROR)
+    public actual open fun <TContinuationResult> onSuccessTask(executor: java.util.concurrent.Executor, successContinuation: SuccessContinuation<TResult, TContinuationResult>): Task<TContinuationResult> = throw UnsupportedOperationException(TASK_CONTINUATION_EXECUTOR_JVM_ONLY)
 }
 
 public actual class TaskCompletionSource<TResult> actual constructor() {

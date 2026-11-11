@@ -4,6 +4,7 @@
 
 package com.google.firebase.perf.metrics
 
+import dev.gitlive.firebase.perf.TRACE_PARCELABLE_ANDROID_ONLY
 import kotlin.jvm.JvmField
 import kotlin.jvm.Synchronized
 
@@ -57,6 +58,14 @@ public actual class Trace internal constructor(internal val name: String) {
         customAttributes.remove(attribute)
     }
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun describeContents(): Int = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
+
     override fun toString(): String = "Trace($name)"
 
     public actual companion object {
@@ -75,5 +84,9 @@ public actual class Trace internal constructor(internal val name: String) {
         /** Maximum length of a trace name. */
         @JvmField
         public actual val MAX_TRACE_NAME_LENGTH: Int = 100
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TRACE_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual val CREATOR: android.os.Parcelable.Creator<Trace> get() = throw UnsupportedOperationException(TRACE_PARCELABLE_ANDROID_ONLY)
     }
 }

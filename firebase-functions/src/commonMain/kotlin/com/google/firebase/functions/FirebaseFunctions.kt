@@ -4,6 +4,7 @@
 
 package com.google.firebase.functions
 
+import dev.gitlive.firebase.functions.USE_FUNCTIONS_EMULATOR_DEPRECATED
 import com.google.firebase.FirebaseApp
 import java.net.URL
 
@@ -11,7 +12,7 @@ import java.net.URL
  * The entry point for Cloud Functions for Firebase, mirroring `com.google.firebase.functions.FirebaseFunctions` from the
  * Firebase Android SDK: creates references to callable HTTPS functions.
  *
- * Not mirrored: `useFunctionsEmulator` (deprecated in the Android SDK, use [useEmulator]).
+ * `useFunctionsEmulator`, deprecated in the Android SDK, parses its origin into [useEmulator].
  */
 public expect class FirebaseFunctions {
     /** Returns a reference to the callable HTTPS trigger with the given [name]. */
@@ -34,6 +35,10 @@ public expect class FirebaseFunctions {
      * instance for any function call.
      */
     public fun useEmulator(host: String, port: Int)
+
+    /** Deprecated in the SDK: [useEmulator] with the host and port of [origin] (`http://10.0.2.2:5001`). */
+    @Deprecated(USE_FUNCTIONS_EMULATOR_DEPRECATED, ReplaceWith("useEmulator(host, port)"))
+    public fun useFunctionsEmulator(origin: String)
 
     public companion object {
         /** The [FirebaseFunctions] instance of the default [FirebaseApp], for the default region `us-central1`. */

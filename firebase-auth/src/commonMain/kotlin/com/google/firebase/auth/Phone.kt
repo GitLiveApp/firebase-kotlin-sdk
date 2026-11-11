@@ -4,6 +4,9 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.PHONE_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PHONE_TIMEOUT_ANDROID_ONLY
+import dev.gitlive.firebase.auth.VERIFY_PHONE_NUMBER_DEPRECATED
 import com.google.firebase.FirebaseException
 
 /**
@@ -15,6 +18,16 @@ import com.google.firebase.FirebaseException
  * report [OnVerificationStateChangedCallbacks.onCodeSent].
  */
 public expect class PhoneAuthProvider {
+    /** Deprecated in the SDK and Android-only: verifies [phoneNumber] with the instance API; use [verifyPhoneNumber] with [PhoneAuthOptions]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: java.util.concurrent.TimeUnit, activity: android.app.Activity, callbacks: OnVerificationStateChangedCallbacks)
+
+    /** Deprecated in the SDK and Android-only: resends the code of [forceResendingToken]; use [verifyPhoneNumber] with [PhoneAuthOptions]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: java.util.concurrent.TimeUnit, activity: android.app.Activity, callbacks: OnVerificationStateChangedCallbacks, forceResendingToken: ForceResendingToken)
+
     /** A token of a sent code; passing it to [PhoneAuthOptions.Builder.setForceResendingToken] sends a new one. */
     public class ForceResendingToken
 
@@ -55,7 +68,8 @@ public expect class PhoneAuthProvider {
 
 /**
  * The options of a phone number verification, mirroring `com.google.firebase.auth.PhoneAuthOptions`; built with
- * [Builder]. The Android SDK also takes the `Activity` the verification is attached to and the auto-retrieval timeout.
+ * [Builder]. The `Activity` the verification is attached to and the auto-retrieval timeout are Android-only, declared through
+ * the error-deprecated stand-ins.
  */
 public expect class PhoneAuthOptions {
     public class Builder(firebaseAuth: FirebaseAuth) {
@@ -75,6 +89,16 @@ public expect class PhoneAuthOptions {
 
         /** Whether the user must enter the code even when the SDK could verify the number itself. */
         public fun requireSmsValidation(requireSmsValidation: Boolean): Builder
+
+        /** Android only: the activity the verification (and its reCAPTCHA fallback) is attached to. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_ACTIVITY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public fun setActivity(activity: android.app.Activity): Builder
+
+        /** Android only: how long to wait for SMS auto-retrieval before [PhoneAuthProvider.OnVerificationStateChangedCallbacks.onCodeAutoRetrievalTimeOut]. */
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_TIMEOUT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public fun setTimeout(timeout: Long?, unit: java.util.concurrent.TimeUnit): Builder
 
         public fun build(): PhoneAuthOptions
     }
