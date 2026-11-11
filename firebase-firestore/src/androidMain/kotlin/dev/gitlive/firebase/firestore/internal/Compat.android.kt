@@ -43,8 +43,11 @@ internal actual suspend fun <T> FirebaseFirestore.runSuspendTransaction(updateFu
 
 internal actual suspend fun Transaction.getAwait(documentRef: DocumentReference): DocumentSnapshot = get(documentRef)
 
+// The Executor overloads are error-deprecated in common code (java.util.concurrent.Executor is a stand-in there); this is the Android code they exist for.
+@Suppress("DEPRECATION_ERROR")
 internal actual fun Query.wrapperSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = addSnapshotListener(firestore.callbackExecutor, metadataChanges, listener)
 
+@Suppress("DEPRECATION_ERROR")
 internal actual fun DocumentReference.wrapperSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = addSnapshotListener(firestore.callbackExecutor, metadataChanges, listener)
 
 internal actual fun Query.wrapperSnapshotListener(listenOptions: SnapshotListenOptions, listener: EventListener<QuerySnapshot>): ListenerRegistration = addSnapshotListener(listenOptions, listener)

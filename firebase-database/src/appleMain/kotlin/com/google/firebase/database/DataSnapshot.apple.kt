@@ -11,9 +11,18 @@ import kotlinx.cinterop.toKString
 import platform.Foundation.NSNull
 import platform.Foundation.NSNumber
 import platform.Foundation.allObjects
+import dev.gitlive.firebase.database.REFLECTIVE_READ
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class DataSnapshot internal constructor(public val ios: FIRDataSnapshot) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual fun exists(): Boolean = ios.exists()
     public actual val key: String? get() = ios.key
     public actual val ref: DatabaseReference get() = DatabaseReference(ios.ref)
@@ -38,6 +47,14 @@ public actual class DataSnapshot internal constructor(public val ios: FIRDataSna
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class MutableData internal constructor(public val ios: FIRMutableData) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual val key: String? get() = ios.key
 
     public actual var value: Any?

@@ -4,7 +4,12 @@
 
 package com.google.firebase.firestore
 
-import android.app.Activity
+import dev.gitlive.firebase.firestore.INDEX_CONFIGURATION_DEPRECATED
+import dev.gitlive.firebase.firestore.LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.LISTENER_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.firestore.PROGRESS_LISTENER_EXECUTOR_JVM_ONLY
+import dev.gitlive.firebase.firestore.PERSISTENCE_SETTINGS_DEPRECATED
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -15,7 +20,6 @@ import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 import dev.gitlive.firebase.firestore.REFLECTIVE_SET
 import dev.gitlive.firebase.firestore.REFLECTIVE_UPDATE
 import dev.gitlive.firebase.firestore.stub
-import java.util.concurrent.Executor
 import dev.gitlive.firebase.firestore.LOAD_BUNDLE_STREAM_ANDROID_ONLY
 
 /*
@@ -42,6 +46,17 @@ public actual class FirebaseFirestore private constructor() {
     public actual fun <TResult> runTransaction(updateFunction: Transaction.Function<TResult>): Task<TResult> = stub()
     public actual fun <TResult> runTransaction(options: TransactionOptions, updateFunction: Transaction.Function<TResult>): Task<TResult> = stub()
     public actual fun addSnapshotsInSyncListener(runnable: Runnable): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotsInSyncListener(executor: java.util.concurrent.Executor, runnable: Runnable): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotsInSyncListener(runnable)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotsInSyncListener(activity: android.app.Activity, runnable: Runnable): ListenerRegistration = stub()
+
+    @Deprecated(INDEX_CONFIGURATION_DEPRECATED, ReplaceWith("persistentCacheIndexManager?.enableIndexAutoCreation()"), DeprecationLevel.ERROR)
+    public actual fun setIndexConfiguration(json: String): Task<Nothing?> = stub()
     public actual fun loadBundle(bundleData: ByteArray): LoadBundleTask = stub()
 
     @Suppress("DEPRECATION_ERROR")
@@ -86,8 +101,14 @@ public actual class PersistentCacheIndexManager private constructor() {
 
 public actual abstract class LoadBundleTask private constructor() : Task<LoadBundleTaskProgress>() {
     public actual fun addOnProgressListener(listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = stub()
-    public fun addOnProgressListener(executor: Executor, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = stub()
-    public fun addOnProgressListener(activity: Activity, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROGRESS_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<LoadBundleTaskProgress>): LoadBundleTask = stub()
 }
 
 public actual class LoadBundleTaskProgress private constructor() {
@@ -152,8 +173,21 @@ public actual open class Query {
     public actual fun addSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
     public actual fun addSnapshotListener(options: SnapshotListenOptions, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
 
-    /** Not in the common API (the executor is Android-only); the dev.gitlive layer's Android listeners bind to this member. */
-    public fun addSnapshotListener(executor: Executor, metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, metadataChanges: MetadataChanges, listener: EventListener<QuerySnapshot>): ListenerRegistration = stub()
     public actual fun count(): AggregateQuery = stub()
     public actual fun aggregate(aggregateField: AggregateField, vararg aggregateFields: AggregateField): AggregateQuery = stub()
 
@@ -246,8 +280,21 @@ public actual class DocumentReference private constructor() {
     public actual fun addSnapshotListener(metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
     public actual fun addSnapshotListener(options: SnapshotListenOptions, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
 
-    /** Not in the common API (the executor is Android-only); the dev.gitlive layer's Android listeners bind to this member. */
-    public fun addSnapshotListener(executor: Executor, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(executor: java.util.concurrent.Executor, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addSnapshotListener(metadataChanges, listener)"), DeprecationLevel.ERROR)
+    public actual fun addSnapshotListener(activity: android.app.Activity, metadataChanges: MetadataChanges, listener: EventListener<DocumentSnapshot>): ListenerRegistration = stub()
 }
 
 @Suppress("DEPRECATION_ERROR")
@@ -289,22 +336,22 @@ public actual open class DocumentSnapshot {
 
     // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    public open fun <T> toObject(valueType: Class<T>): T? = stub()
+    public actual open fun <T> toObject(valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    public open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual open fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(field: String, valueType: Class<T>): T? = stub()
+    public actual fun <T> get(field: String, valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual fun <T> get(field: String, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
+    public actual fun <T> get(fieldPath: FieldPath, valueType: Class<T>): T? = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
-    public fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
+    public actual fun <T> get(fieldPath: FieldPath, valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = stub()
 
     public actual enum class ServerTimestampBehavior {
         NONE,
@@ -317,10 +364,10 @@ public actual open class DocumentSnapshot {
 public actual class QueryDocumentSnapshot private constructor() : DocumentSnapshot() {
     // A query document exists, so the SDK's overrides return a value.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    override fun <T> toObject(valueType: Class<T>): T = stub()
+    actual override fun <T> toObject(valueType: Class<T>): T = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
-    override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
+    actual override fun <T> toObject(valueType: Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T = stub()
 }
 
 public actual class QuerySnapshot private constructor() : Iterable<QueryDocumentSnapshot> {
@@ -334,10 +381,10 @@ public actual class QuerySnapshot private constructor() : Iterable<QueryDocument
 
     // The SDK's reflective mapping; the reified extensions (Firestore.kt) map through the format on every platform.
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
-    public fun <T> toObjects(clazz: Class<T>): List<T> = stub()
+    public actual fun <T> toObjects(clazz: Class<T>): List<T> = stub()
 
     @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
-    public fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
+    public actual fun <T> toObjects(clazz: Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = stub()
 
     actual override fun iterator(): Iterator<QueryDocumentSnapshot> = stub()
 }
@@ -541,6 +588,12 @@ public actual class FirebaseFirestoreSettings private constructor() {
     public actual val cacheSettings: LocalCacheSettings? get() = stub()
     public actual val grpcFlowControlWindow: Int get() = stub()
 
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings !is MemoryCacheSettings"))
+    public actual val isPersistenceEnabled: Boolean get() = stub()
+
+    @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("cacheSettings"))
+    public actual val cacheSizeBytes: Long get() = stub()
+
     public actual companion object {
         @JvmField
         public actual val CACHE_SIZE_UNLIMITED: Long = -1L
@@ -565,6 +618,18 @@ public actual class FirebaseFirestoreSettings private constructor() {
         public actual fun setSslEnabled(value: Boolean): Builder = stub()
         public actual fun setLocalCacheSettings(cacheSettings: LocalCacheSettings): Builder = stub()
         public actual fun setGrpcFlowControlWindow(grpcFlowControlWindow: Int): Builder = stub()
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual val isPersistenceEnabled: Boolean get() = stub()
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual val cacheSizeBytes: Long get() = stub()
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual fun setPersistenceEnabled(value: Boolean): Builder = stub()
+
+        @Deprecated(PERSISTENCE_SETTINGS_DEPRECATED, ReplaceWith("setLocalCacheSettings(cacheSettings)"))
+        public actual fun setCacheSizeBytes(value: Long): Builder = stub()
         public actual fun build(): FirebaseFirestoreSettings = stub()
     }
 }

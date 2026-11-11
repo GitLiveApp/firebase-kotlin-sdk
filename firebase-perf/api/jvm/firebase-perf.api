@@ -75,6 +75,7 @@ public final class com/google/firebase/perf/metrics/Trace {
 	public static final field MAX_ATTRIBUTE_VALUE_LENGTH I
 	public static final field MAX_TRACE_CUSTOM_ATTRIBUTES I
 	public static final field MAX_TRACE_NAME_LENGTH I
+	public final fun describeContents ()I
 	public final fun getAttribute (Ljava/lang/String;)Ljava/lang/String;
 	public final fun getAttributes ()Ljava/util/Map;
 	public final fun getLongMetric (Ljava/lang/String;)J
@@ -85,9 +86,11 @@ public final class com/google/firebase/perf/metrics/Trace {
 	public final fun start ()V
 	public final fun stop ()V
 	public fun toString ()Ljava/lang/String;
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/google/firebase/perf/metrics/Trace$Companion {
+	public final fun getCREATOR ()Landroid/os/Parcelable$Creator;
 }
 
 public final class dev/gitlive/firebase/perf/FirebasePerformance {

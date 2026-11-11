@@ -1,6 +1,6 @@
 # Android SDK source compatibility of firebase-firestore
 # Android SDK api.txt ref: fc5a2bee3a2f81f2f35652867628a3f4913e915d
-# 100% of 1638 public members available (1583 identical, 55 mapped, 0 missing, 0 omitted)
+# 100% of 1638 public members available (1602 identical, 36 mapped, 0 missing, 0 omitted)
 #
 com.google.firebase.firestore.AggregateField
   OK    static AverageAggregateField average(FieldPath)
@@ -51,12 +51,12 @@ com.google.firebase.firestore.DocumentChange.Type
 com.google.firebase.firestore.DocumentId
 com.google.firebase.firestore.DocumentReference
   OK    ListenerRegistration addSnapshotListener(EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)  [deprecated: The Activity overloads of the snapshot listeners are Android-only, where the listener is removed when the Activity stops; use the overload without an Activity and remove the ListenerRegistration yourself]
   OK    ListenerRegistration addSnapshotListener(MetadataChanges, EventListener)
   OK    ListenerRegistration addSnapshotListener(SnapshotListenOptions, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)  [deprecated: The Executor overloads of the snapshot listeners are JVM-only; the multiplatform listener is called on the thread that delivers the snapshot: use the overload without an Executor and dispatch from the listener]
+  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)  [deprecated: The Activity overloads of the snapshot listeners are Android-only, where the listener is removed when the Activity stops; use the overload without an Activity and remove the ListenerRegistration yourself]
+  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)  [deprecated: The Executor overloads of the snapshot listeners are JVM-only; the multiplatform listener is called on the thread that delivers the snapshot: use the overload without an Executor and dispatch from the listener]
   OK    CollectionReference collection(String)
   OK    Task delete()
   OK    Task get()
@@ -151,8 +151,8 @@ com.google.firebase.firestore.Filter
   OK    static Filter or(Filter[])
 com.google.firebase.firestore.FirebaseFirestore
   OK    ListenerRegistration addSnapshotsInSyncListener(Runnable)
-  PLAT  ListenerRegistration addSnapshotsInSyncListener(Activity, Runnable)
-  PLAT  ListenerRegistration addSnapshotsInSyncListener(Executor, Runnable)
+  PLAT  ListenerRegistration addSnapshotsInSyncListener(Activity, Runnable)  [deprecated: The Activity overloads of the snapshot listeners are Android-only, where the listener is removed when the Activity stops; use the overload without an Activity and remove the ListenerRegistration yourself]
+  PLAT  ListenerRegistration addSnapshotsInSyncListener(Executor, Runnable)  [deprecated: The Executor overloads of the snapshot listeners are JVM-only; the multiplatform listener is called on the thread that delivers the snapshot: use the overload without an Executor and dispatch from the listener]
   OK    WriteBatch batch()
   OK    Task clearPersistence()
   OK    CollectionReference collection(String)
@@ -176,7 +176,7 @@ com.google.firebase.firestore.FirebaseFirestore
   OK    Task runTransaction(Function)
   OK    Task runTransaction(TransactionOptions, Function)
   OK    void setFirestoreSettings(FirebaseFirestoreSettings)
-  SKIP  Task setIndexConfiguration(String)
+  SKIP  Task setIndexConfiguration(String)  [deprecated: Deprecated in the Firebase Android SDK and not available off Android; let the SDK create cache indexes with persistentCacheIndexManager?.enableIndexAutoCreation()]
   OK    static void setLoggingEnabled(boolean)
   OK    Task terminate()
   OK    void useEmulator(String, int)
@@ -266,32 +266,32 @@ com.google.firebase.firestore.ListenerRegistration
   OK    void remove()
 com.google.firebase.firestore.LoadBundleTask
   MAP   Task addOnCanceledListener(OnCanceledListener)  [inherited]
-  PLAT  Task addOnCanceledListener(Activity, OnCanceledListener)
-  PLAT  Task addOnCanceledListener(Executor, OnCanceledListener)
+  PLAT  Task addOnCanceledListener(Activity, OnCanceledListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  Task addOnCanceledListener(Executor, OnCanceledListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Task addOnCompleteListener(OnCompleteListener)  [inherited]
-  PLAT  Task addOnCompleteListener(Activity, OnCompleteListener)
-  PLAT  Task addOnCompleteListener(Executor, OnCompleteListener)
+  PLAT  Task addOnCompleteListener(Activity, OnCompleteListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  Task addOnCompleteListener(Executor, OnCompleteListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Task addOnFailureListener(OnFailureListener)  [inherited]
-  PLAT  Task addOnFailureListener(Activity, OnFailureListener)
-  PLAT  Task addOnFailureListener(Executor, OnFailureListener)
+  PLAT  Task addOnFailureListener(Activity, OnFailureListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  Task addOnFailureListener(Executor, OnFailureListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   OK    LoadBundleTask addOnProgressListener(OnProgressListener)
-  PLAT  LoadBundleTask addOnProgressListener(Activity, OnProgressListener)
-  PLAT  LoadBundleTask addOnProgressListener(Executor, OnProgressListener)
+  PLAT  LoadBundleTask addOnProgressListener(Activity, OnProgressListener)  [deprecated: addOnProgressListener(Activity, OnProgressListener) is Android-only, where the listener is dropped when the Activity stops; use addOnProgressListener(listener)]
+  PLAT  LoadBundleTask addOnProgressListener(Executor, OnProgressListener)  [deprecated: addOnProgressListener(Executor, OnProgressListener) is JVM-only; the multiplatform listener is called on the thread that reports the progress: use addOnProgressListener(listener) and dispatch from the listener]
   MAP   Task addOnSuccessListener(OnSuccessListener)  [inherited]
-  PLAT  Task addOnSuccessListener(Activity, OnSuccessListener)
-  PLAT  Task addOnSuccessListener(Executor, OnSuccessListener)
+  PLAT  Task addOnSuccessListener(Activity, OnSuccessListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
+  PLAT  Task addOnSuccessListener(Executor, OnSuccessListener)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Task continueWith(Continuation)  [inherited]
-  PLAT  Task continueWith(Executor, Continuation)
+  PLAT  Task continueWith(Executor, Continuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Task continueWithTask(Continuation)  [inherited]
-  PLAT  Task continueWithTask(Executor, Continuation)
+  PLAT  Task continueWithTask(Executor, Continuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
   MAP   Exception getException()  [inherited]
   MAP   LoadBundleTaskProgress getResult()  [inherited]
-  PLAT  LoadBundleTaskProgress getResult(Class)
+  PLAT  LoadBundleTaskProgress getResult(Class)  [deprecated: getResult(Class) is JVM-only (error-deprecated in com.google.android.gms.tasks.Task); use result or exception]
   MAP   boolean isCanceled()  [inherited]
   MAP   boolean isComplete()  [inherited]
   MAP   boolean isSuccessful()  [inherited]
   MAP   Task onSuccessTask(SuccessContinuation)  [inherited]
-  PLAT  Task onSuccessTask(Executor, SuccessContinuation)
+  PLAT  Task onSuccessTask(Executor, SuccessContinuation)  [deprecated: the Executor and Activity overloads of the Task API are Android/JVM-only (error-deprecated in com.google.android.gms.tasks.Task)]
 com.google.firebase.firestore.LoadBundleTaskProgress
   OK    long getBytesLoaded()
   OK    int getDocumentsLoaded()
@@ -408,12 +408,12 @@ com.google.firebase.firestore.PropertyName
   OK    String value()
 com.google.firebase.firestore.Query
   OK    ListenerRegistration addSnapshotListener(EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Activity, EventListener)  [deprecated: The Activity overloads of the snapshot listeners are Android-only, where the listener is removed when the Activity stops; use the overload without an Activity and remove the ListenerRegistration yourself]
   OK    ListenerRegistration addSnapshotListener(MetadataChanges, EventListener)
   OK    ListenerRegistration addSnapshotListener(SnapshotListenOptions, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)
-  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)
+  PLAT  ListenerRegistration addSnapshotListener(Executor, EventListener)  [deprecated: The Executor overloads of the snapshot listeners are JVM-only; the multiplatform listener is called on the thread that delivers the snapshot: use the overload without an Executor and dispatch from the listener]
+  PLAT  ListenerRegistration addSnapshotListener(Activity, MetadataChanges, EventListener)  [deprecated: The Activity overloads of the snapshot listeners are Android-only, where the listener is removed when the Activity stops; use the overload without an Activity and remove the ListenerRegistration yourself]
+  PLAT  ListenerRegistration addSnapshotListener(Executor, MetadataChanges, EventListener)  [deprecated: The Executor overloads of the snapshot listeners are JVM-only; the multiplatform listener is called on the thread that delivers the snapshot: use the overload without an Executor and dispatch from the listener]
   OK    AggregateQuery aggregate(AggregateField, AggregateField[])
   OK    AggregateQuery count()
   OK    Query endAt(DocumentSnapshot)
@@ -476,15 +476,15 @@ com.google.firebase.firestore.SetOptions
   OK    static SetOptions mergeFields(String[])
   OK    static SetOptions mergeFields(List)
 com.google.firebase.firestore.SnapshotListenOptions
-  PLAT  Activity getActivity()
-  PLAT  Executor getExecutor()
+  PLAT  Activity getActivity()  [deprecated: SnapshotListenOptions.activity is Android-only, where the listener is removed when the Activity stops; remove the ListenerRegistration yourself]
+  PLAT  Executor getExecutor()  [deprecated: SnapshotListenOptions.executor is JVM-only; the multiplatform listener is called on the thread that delivers the snapshot, so dispatch from the listener]
   OK    MetadataChanges getMetadataChanges()
   OK    ListenSource getSource()
 com.google.firebase.firestore.SnapshotListenOptions.Builder
   OK    Builder()
   OK    SnapshotListenOptions build()
-  PLAT  Builder setActivity(Activity)
-  PLAT  Builder setExecutor(Executor)
+  PLAT  Builder setActivity(Activity)  [deprecated: SnapshotListenOptions.activity is Android-only, where the listener is removed when the Activity stops; remove the ListenerRegistration yourself]
+  PLAT  Builder setExecutor(Executor)  [deprecated: SnapshotListenOptions.executor is JVM-only; the multiplatform listener is called on the thread that delivers the snapshot, so dispatch from the listener]
   OK    Builder setMetadataChanges(MetadataChanges)
   OK    Builder setSource(ListenSource)
 com.google.firebase.firestore.SnapshotMetadata
@@ -525,16 +525,16 @@ com.google.firebase.firestore.WriteBatch
 com.google.firebase.firestore.WriteBatch.Function
   OK    void apply(WriteBatch)
 com.google.firebase.firestore.pipeline.AbstractOptions
-  MAP   T adding(AbstractOptions)  [returns AbstractOptions]
-  MAP   T with(String, boolean)  [returns AbstractOptions]
-  MAP   T with(String, AbstractOptions)  [returns AbstractOptions]
-  MAP   T with(String, Field)  [returns AbstractOptions]
-  MAP   T with(String, RawOptions)  [returns AbstractOptions]
-  MAP   T with(String, double)  [returns AbstractOptions]
-  PLAT  T with(String, NonExistentClass)
-  MAP   T with(String, String)  [returns AbstractOptions]
-  MAP   T with(String, String[])  [returns AbstractOptions]
-  MAP   T with(String, long)  [returns AbstractOptions]
+  OK    T adding(AbstractOptions)
+  OK    T with(String, boolean)
+  OK    T with(String, AbstractOptions)
+  OK    T with(String, Field)
+  OK    T with(String, RawOptions)
+  OK    T with(String, double)
+  PLAT  T with(String, NonExistentClass)  [deprecated: com.google.firestore.v1.Value is the Android SDK's protobuf wire type and only exists on Android and the JVM; pass the option as a String, Boolean, Long, Double, Field or RawOptions]
+  OK    T with(String, String)
+  OK    T with(String, String[])
+  OK    T with(String, long)
 com.google.firebase.firestore.pipeline.AggregateFunction
   OK    AliasedAggregate alias(String)
   OK    static AggregateFunction arrayAgg(Expression)
@@ -1726,9 +1726,9 @@ com.google.firebase.firestore.pipeline.FindNearestOptions
 com.google.firebase.firestore.pipeline.FindNearestStage
 com.google.firebase.firestore.pipeline.FindNearestStage.Companion
 com.google.firebase.firestore.pipeline.FindNearestStage.DistanceMeasure
-  MAP   static NonExistentClass COSINE  [returns DistanceMeasure]
-  MAP   static NonExistentClass DOT_PRODUCT  [returns DistanceMeasure]
-  MAP   static NonExistentClass EUCLIDEAN  [returns DistanceMeasure]
+  OK    static NonExistentClass COSINE
+  OK    static NonExistentClass DOT_PRODUCT
+  OK    static NonExistentClass EUCLIDEAN
 com.google.firebase.firestore.pipeline.FindNearestStage.DistanceMeasure.Companion
 com.google.firebase.firestore.pipeline.FunctionExpression
 com.google.firebase.firestore.pipeline.Ordering
@@ -1744,7 +1744,7 @@ com.google.firebase.firestore.pipeline.Ordering.Companion
   OK    Ordering descending(Expression)
   OK    Ordering descending(String)
 com.google.firebase.firestore.pipeline.Ordering.Direction
-  PLAT  NonExistentClass getProto()
+  PLAT  NonExistentClass getProto()  [deprecated: Ordering.Direction.proto is the Android SDK's protobuf wire value and only exists on Android and the JVM]
   OK    static Direction ASCENDING
   OK    static Direction DESCENDING
 com.google.firebase.firestore.pipeline.RawOptions
@@ -1763,8 +1763,8 @@ com.google.firebase.firestore.pipeline.SampleStage.Companion
   OK    SampleStage withPercentage(double)
 com.google.firebase.firestore.pipeline.SampleStage.Mode
 com.google.firebase.firestore.pipeline.SampleStage.Mode.Companion
-  MAP   NonExistentClass getDOCUMENTS()  [returns Mode]
-  MAP   NonExistentClass getPERCENT()  [returns Mode]
+  OK    NonExistentClass getDOCUMENTS()
+  OK    NonExistentClass getPERCENT()
 com.google.firebase.firestore.pipeline.SearchStage
   OK    SearchStage withAddFields(Selectable, Selectable[])
   OK    SearchStage withLanguageCode(String)
@@ -1780,12 +1780,12 @@ com.google.firebase.firestore.pipeline.SearchStage.Companion
 com.google.firebase.firestore.pipeline.Selectable
   OK    Selectable()
 com.google.firebase.firestore.pipeline.Stage
-  MAP   T withOption(String, boolean)  [returns Stage]
-  MAP   T withOption(String, Field)  [returns Stage]
-  MAP   T withOption(String, double)  [returns Stage]
-  PLAT  T withOption(String, NonExistentClass)
-  MAP   T withOption(String, String)  [returns Stage]
-  MAP   T withOption(String, long)  [returns Stage]
+  OK    T withOption(String, boolean)
+  OK    T withOption(String, Field)
+  OK    T withOption(String, double)
+  PLAT  T withOption(String, NonExistentClass)  [deprecated: com.google.firestore.v1.Value is the Android SDK's protobuf wire type and only exists on Android and the JVM; pass the option as a String, Boolean, Long, Double, Field or RawOptions]
+  OK    T withOption(String, String)
+  OK    T withOption(String, long)
 com.google.firebase.firestore.pipeline.Stage.Companion
 com.google.firebase.firestore.pipeline.SubcollectionSource
   OK    static SubcollectionSource of(String)

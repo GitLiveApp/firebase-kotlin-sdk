@@ -2,17 +2,31 @@ public final class com/google/firebase/messaging/FirebaseMessaging {
 	public static final field Companion Lcom/google/firebase/messaging/FirebaseMessaging$Companion;
 	public static final field INSTANCE_ID_SCOPE Ljava/lang/String;
 	public final fun deleteToken ()Lcom/google/android/gms/tasks/Task;
+	public final fun deliveryMetricsExportToBigQueryEnabled ()Z
 	public static final fun getInstance ()Lcom/google/firebase/messaging/FirebaseMessaging;
 	public final fun getToken ()Lcom/google/android/gms/tasks/Task;
 	public final fun isAutoInitEnabled ()Z
+	public final fun isNotificationDelegationEnabled ()Z
+	public final fun register ()Lcom/google/android/gms/tasks/Task;
+	public final fun send (Lcom/google/firebase/messaging/RemoteMessage;)V
 	public final fun setAutoInitEnabled (Z)V
+	public final fun setDeliveryMetricsExportToBigQuery (Z)V
+	public final fun setNotificationDelegationEnabled (Z)Lcom/google/android/gms/tasks/Task;
 	public final fun subscribeToTopic (Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
 	public fun toString ()Ljava/lang/String;
+	public final fun unregister ()Lcom/google/android/gms/tasks/Task;
 	public final fun unsubscribeFromTopic (Ljava/lang/String;)Lcom/google/android/gms/tasks/Task;
 }
 
 public final class com/google/firebase/messaging/FirebaseMessaging$Companion {
 	public final fun getInstance ()Lcom/google/firebase/messaging/FirebaseMessaging;
+}
+
+public abstract class com/google/firebase/messaging/FirebaseMessagingService {
+	public fun <init> ()V
+	public fun onDeletedMessages ()V
+	public fun onMessageReceived (Lcom/google/firebase/messaging/RemoteMessage;)V
+	public fun onNewToken (Ljava/lang/String;)V
 }
 
 public final class com/google/firebase/messaging/MessagingKt {
@@ -37,6 +51,7 @@ public final class com/google/firebase/messaging/RemoteMessage {
 	public final fun getTtl ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+	public final fun writeToParcel (Landroid/os/Parcel;I)V
 }
 
 public final class com/google/firebase/messaging/RemoteMessage$Builder {

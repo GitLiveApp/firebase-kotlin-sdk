@@ -4,6 +4,7 @@
 
 package com.google.firebase
 
+import dev.gitlive.firebase.RECAPTCHA_SITE_KEY_DEPRECATED
 import android.content.Context
 import dev.gitlive.firebase.stub
 
@@ -75,6 +76,9 @@ public actual class FirebaseOptions private constructor() {
         public actual fun setProjectId(projectId: String?): Builder = stub()
         public actual fun setStorageBucket(storageBucket: String?): Builder = stub()
         public actual fun setGaTrackingId(gaTrackingId: String?): Builder = stub()
+
+        @Deprecated(RECAPTCHA_SITE_KEY_DEPRECATED)
+        public actual fun setRecaptchaSiteKey(recaptchaSiteKey: String?): Builder = stub()
         public actual fun build(): FirebaseOptions = stub()
     }
 

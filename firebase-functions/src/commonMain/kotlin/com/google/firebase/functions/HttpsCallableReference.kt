@@ -4,6 +4,7 @@
 
 package com.google.firebase.functions
 
+import dev.gitlive.firebase.functions.STREAM_JVM_ONLY
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.functions.SET_TIMEOUT_JVM_ONLY
 import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
@@ -18,8 +19,8 @@ import dev.gitlive.firebase.functions.WITH_TIMEOUT_JVM_ONLY
  * and can only be called from Android/JVM code: from common code they fail to compile with a message naming the
  * `Duration` forms.
  *
- * Not mirrored: `stream()` (returns an `org.reactivestreams.Publisher`, which is JVM-only, and the iOS SDK's streaming
- * API is Swift-only).
+ * `stream()` returns an `org.reactivestreams.Publisher`, which is JVM-only (and the iOS SDK's streaming API is Swift-only): it
+ * is declared through the error-deprecated stand-in and can only be called from Android/JVM code.
  */
 public expect class HttpsCallableReference {
     /**
@@ -46,4 +47,14 @@ public expect class HttpsCallableReference {
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(WITH_TIMEOUT_JVM_ONLY, level = DeprecationLevel.ERROR)
     public fun withTimeout(timeout: Long, units: java.util.concurrent.TimeUnit): HttpsCallableReference
+
+    /** Android/JVM only: streams the function's response; not available in common code. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public fun stream(): org.reactivestreams.Publisher<StreamResponse>
+
+    /** Android/JVM only: streams the function's response to [data]; not available in common code. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_JVM_ONLY, level = DeprecationLevel.ERROR)
+    public fun stream(data: Any?): org.reactivestreams.Publisher<StreamResponse>
 }

@@ -13,6 +13,7 @@ import swiftPMImport.dev.gitlive.firebase.firestore.FIRQuerySnapshot
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRServerTimestampBehavior
 import swiftPMImport.dev.gitlive.firebase.firestore.FIRSnapshotMetadata
 import com.google.firebase.Timestamp
+import dev.gitlive.firebase.firestore.REFLECTIVE_READ
 
 private fun DocumentSnapshot.ServerTimestampBehavior.toIos(): FIRServerTimestampBehavior = when (this) {
     DocumentSnapshot.ServerTimestampBehavior.NONE -> FIRServerTimestampBehavior.FIRServerTimestampBehaviorNone
@@ -59,6 +60,30 @@ public actual class DocumentChange internal constructor(public val ios: FIRDocum
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual open class DocumentSnapshot internal constructor(public open val ios: FIRDocumentSnapshot) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public actual open fun <T> toObject(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    public actual open fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(field: String, valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(field, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(field: String, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getField<T>(fieldPath, serverTimestampBehavior)", "com.google.firebase.serialization.getField"), DeprecationLevel.ERROR)
+    public actual fun <T> get(fieldPath: FieldPath, valueType: java.lang.Class<T>, serverTimestampBehavior: ServerTimestampBehavior): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual val id: String get() = ios.documentID
     public actual val reference: DocumentReference get() = DocumentReference(ios.reference)
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
@@ -120,10 +145,26 @@ private inline fun <reified T> typed(field: String, value: Any?): T? = when (val
 }
 
 /** @property ios The underlying Firebase iOS SDK object. */
-public actual class QueryDocumentSnapshot internal constructor(override val ios: FIRQueryDocumentSnapshot) : DocumentSnapshot(ios)
+public actual class QueryDocumentSnapshot internal constructor(override val ios: FIRQueryDocumentSnapshot) : DocumentSnapshot(ios) {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>()", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    actual override fun <T> toObject(valueType: java.lang.Class<T>): T = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObject<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObject"), DeprecationLevel.ERROR)
+    actual override fun <T> toObject(valueType: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): T = throw UnsupportedOperationException(REFLECTIVE_READ)
+}
 
 /** @property ios The underlying Firebase iOS SDK object. */
 public actual class QuerySnapshot internal constructor(public val ios: FIRQuerySnapshot) : Iterable<QueryDocumentSnapshot> {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>()", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public actual fun <T> toObjects(clazz: java.lang.Class<T>): List<T> = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("toObjects<T>(serverTimestampBehavior)", "com.google.firebase.serialization.toObjects"), DeprecationLevel.ERROR)
+    public actual fun <T> toObjects(clazz: java.lang.Class<T>, serverTimestampBehavior: DocumentSnapshot.ServerTimestampBehavior): List<T> = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual val query: Query get() = Query(ios.query)
     public actual val metadata: SnapshotMetadata get() = SnapshotMetadata(ios.metadata)
     public actual val documents: List<DocumentSnapshot> get() = ios.documents.map { QueryDocumentSnapshot(it as FIRQueryDocumentSnapshot) }

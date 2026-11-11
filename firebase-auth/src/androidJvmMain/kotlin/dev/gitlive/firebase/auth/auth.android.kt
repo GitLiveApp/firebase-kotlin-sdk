@@ -83,6 +83,8 @@ public actual class PhoneAuthProvider(public val createOptionsBuilder: () -> Pho
 
     // unlike the other platforms android can complete the verification without any user input, via
     // sms auto retrieval, so the credential is whichever of the two arrives first
+    // The Android-only setTimeout and setActivity are error-deprecated in common code; this is the Android code they exist for.
+    @Suppress("DEPRECATION_ERROR")
     public actual suspend fun verifyPhoneNumber(phoneNumber: String, verificationProvider: PhoneVerificationProvider): AuthCredential = supervisorScope {
         // resending replaces the verification id and invalidates the previous one
         val latestVerificationId = MutableStateFlow<String?>(null)

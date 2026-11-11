@@ -4,12 +4,19 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.REGISTER_NOT_AVAILABLE
 import com.google.android.gms.tasks.TaskCompletionSource
 
 /** firebase-java-sdk has no Cloud Messaging: every operation fails with an [UnsupportedOperationException]. */
 public actual class FirebaseMessaging private constructor() {
     public actual fun deleteToken(): Task<Nothing?> = unsupported()
+
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public actual fun send(message: RemoteMessage): Unit = throw UnsupportedOperationException(UPSTREAM_SEND_DECOMMISSIONED)
 
     public actual fun getToken(): Task<String> = unsupported()
 
@@ -19,6 +26,24 @@ public actual class FirebaseMessaging private constructor() {
 
     /** Kept in memory: there is no registration to initialise on the JVM. */
     public actual var isAutoInitEnabled: Boolean = true
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun deliveryMetricsExportToBigQueryEnabled(): Boolean = throw UnsupportedOperationException(DELIVERY_METRICS_ANDROID_ONLY)
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setDeliveryMetricsExportToBigQuery(enable: Boolean): Unit = throw UnsupportedOperationException(DELIVERY_METRICS_ANDROID_ONLY)
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun isNotificationDelegationEnabled(): Boolean = throw UnsupportedOperationException(NOTIFICATION_DELEGATION_ANDROID_ONLY)
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setNotificationDelegationEnabled(enable: Boolean): Task<Nothing?> = throw UnsupportedOperationException(NOTIFICATION_DELEGATION_ANDROID_ONLY)
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun register(): Task<Nothing?> = throw UnsupportedOperationException(REGISTER_NOT_AVAILABLE)
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun unregister(): Task<Nothing?> = throw UnsupportedOperationException(REGISTER_NOT_AVAILABLE)
 
     override fun toString(): String = "FirebaseMessaging"
 

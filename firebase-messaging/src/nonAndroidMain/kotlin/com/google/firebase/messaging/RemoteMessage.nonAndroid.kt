@@ -4,6 +4,7 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.WRITE_TO_PARCEL_ANDROID_ONLY
 import android.net.Uri
 /*
  * firebase-java-sdk has no Cloud Messaging and the Apple and JS SDKs deliver messages through their own APIs, so off
@@ -31,6 +32,10 @@ public actual class RemoteMessage internal constructor(
     @Deprecated("Use from instead")
     public actual val senderId: String? get() = null
     public actual val sentTime: Long get() = 0
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(WRITE_TO_PARCEL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = throw UnsupportedOperationException(WRITE_TO_PARCEL_ANDROID_ONLY)
 
     @Suppress("DEPRECATION")
     override fun equals(other: Any?): Boolean = other is RemoteMessage && other.to == to && other.data == data && other.messageId == messageId &&

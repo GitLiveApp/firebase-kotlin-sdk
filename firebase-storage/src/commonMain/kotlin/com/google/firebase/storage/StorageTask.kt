@@ -4,6 +4,8 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.TASK_LISTENER_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.storage.TASK_LISTENER_EXECUTOR_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCanceledListener
@@ -23,6 +25,16 @@ public expect abstract class CancellableTask<StateT>() : Task<StateT> {
 
     /** Adds a listener called with a snapshot whenever progress is made. */
     public abstract fun addOnProgressListener(listener: OnProgressListener<StateT>): CancellableTask<StateT>
+
+    /** JVM only: [addOnProgressListener] called on [executor]; the multiplatform listener is called on the progressing thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public open fun addOnProgressListener(executor: java.util.concurrent.Executor, listener: OnProgressListener<StateT>): CancellableTask<StateT>
+
+    /** Android only: [addOnProgressListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnProgressListener(listener)"), DeprecationLevel.ERROR)
+    public open fun addOnProgressListener(activity: android.app.Activity, listener: OnProgressListener<StateT>): CancellableTask<StateT>
 }
 
 /** A [CancellableTask] that can also be paused and resumed, as the Android SDK's `ControllableTask`. */
@@ -38,13 +50,24 @@ public expect abstract class ControllableTask<StateT>() : CancellableTask<StateT
 
     /** Adds a listener called with a snapshot when the task is paused. */
     public abstract fun addOnPausedListener(listener: OnPausedListener<StateT>): ControllableTask<StateT>
+
+    /** JVM only: [addOnPausedListener] called on [executor]; the multiplatform listener is called on the progressing thread. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_EXECUTOR_JVM_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public open fun addOnPausedListener(executor: java.util.concurrent.Executor, listener: OnPausedListener<StateT>): ControllableTask<StateT>
+
+    /** Android only: [addOnPausedListener] scoped to [activity]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TASK_LISTENER_ACTIVITY_ANDROID_ONLY, ReplaceWith("addOnPausedListener(listener)"), DeprecationLevel.ERROR)
+    public open fun addOnPausedListener(activity: android.app.Activity, listener: OnPausedListener<StateT>): ControllableTask<StateT>
 }
 
 /**
  * A long-running Cloud Storage operation with progress, pause, resume and cancel, as the Android SDK's `StorageTask`.
  * Listeners are called on the thread that completes or progresses the task on Apple platforms and JS. The `Task`
  * members (`isComplete`, `result`, `exception`, ...) are inherited; the task subclasses are abstract, as instances only
- * come from a [StorageReference].
+ * come from a [StorageReference]. The `Activity` and `Executor` overloads of the listeners, and the `Executor` continuations,
+ * are inherited from [Task] and the two base classes as error-deprecated Android/JVM-only members.
  */
 public expect abstract class StorageTask<ResultT : StorageTask.ProvideError> protected constructor() : ControllableTask<ResultT> {
     /** The current state of the task, whether or not it is complete. */

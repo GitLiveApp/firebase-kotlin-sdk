@@ -51,13 +51,13 @@ com.google.firebase.Timestamp
   MAP   Timestamp(Date)  [deprecated: the java.util.Date constructor is JVM-only; use Timestamp(instant) with a kotlin.time.Instant, or Timestamp(seconds, nanoseconds)]
   OK    Timestamp(long, int)
   OK    int compareTo(Timestamp)
-  PLAT  int describeContents()
+  PLAT  int describeContents()  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Timestamp maps as a Firestore timestamp through kotlinx.serialization on every platform]
   OK    int getNanoseconds()
   OK    long getSeconds()
   OK    static Timestamp now()
   MAP   Date toDate()  [deprecated: toDate returns a java.util.Date, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds]
   MAP   Instant toInstant()  [deprecated: toInstant returns a java.time.Instant, which is JVM-only; use toKotlinInstant(), or seconds and nanoseconds]
-  PLAT  void writeToParcel(Parcel, int)
-  PLAT  static Creator CREATOR
+  PLAT  void writeToParcel(Parcel, int)  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Timestamp maps as a Firestore timestamp through kotlinx.serialization on every platform]
+  PLAT  static Creator CREATOR  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Timestamp maps as a Firestore timestamp through kotlinx.serialization on every platform]
 com.google.firebase.Timestamp.Companion
   OK    Timestamp now()

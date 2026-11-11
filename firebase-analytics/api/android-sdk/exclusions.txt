@@ -1,4 +1,5 @@
 # Firebase Android SDK APIs intentionally not mirrored by firebase-analytics (see README, "Using the Firebase Android SDK API from common code").
+# @platform members are declared in common code through error-deprecated stand-ins for the Android/JVM type (android.app.Activity, java.util.concurrent.Executor, android.os.Parcel, ...), so common code gets a message naming the type rather than an unresolved reference; they are not counted.
 # The api.txt is generated from the published classes, so it also lists members the SDK hides from its reference documentation.
 
 # Android-only entry points; the instance is obtained with Firebase.analytics from common code.

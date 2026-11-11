@@ -17,6 +17,10 @@ SDK and the Firebase JS SDK.
 > `firebase-storage`, `firebase-database` and `firebase-firestore`. The Kotlin-first `dev.gitlive.firebase` API, which the SDK
 > also provides, is described in the [README](../README.md#kotlin-first-design).
 
+> [samples/notes-android](../samples/notes-android) is an Android app written for this migration: its Firebase code is
+> already laid out as the shared module will be, and every line the port changes carries a `// KMP:` comment with its
+> replacement, one for each kind of change described below.
+
 ## Checklist for a migration
 
 Most Firebase code moves to `commonMain` unchanged. Before you start, look for the few things that cannot cross the
@@ -36,9 +40,12 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    quick-fix applies it. Android code in `androidMain` keeps calling them as before.
 3. **Custom classes.** The Android SDK maps your model classes by reflection, which only exists on Android and the JVM, so the
    writes that take one (`set(Any)`, `update(Map)` and `add(Any)` on Firestore, `setValue(Any?)` and
-   `updateChildren(Map)` on the database) are deprecated with an error, and the class-taking reads (`toObject(Class)`,
-   `toObjects(Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`) are not declared in common code at all,
-   as `java.lang.Class` is JVM-only (see item 8), so they are reported as unresolved. The replacements map a
+   `updateChildren(Map)` on the database) are deprecated with an error, and so are the class-taking reads (`toObject(Class)`,
+   `toObjects(Class)`, `get(field, Class)`, `getValue(Class)` and `getValue(GenericTypeIndicator)`), which are declared
+   through an error-deprecated stand-in for `java.lang.Class`, the way `java.util.Date` is (item 2). A call such as
+   `toObject(Book::class.java)` therefore shows two errors: the deprecation on `toObject`, naming the replacement, and
+   one on `Book::class.java`, as `KClass.java` and `javaClass` are JVM-only and declared the same way (item 9); replacing
+   the call fixes both. The replacements map a
    `@Serializable` class with kotlinx.serialization on every platform: `setData`, `updateData` and `addData`, and the
    reified `toObject<T>()`, `toObjects<T>()`, `getField<T>()`, `dataObjects<T>()` and `getValue<T>()` in
    `com.google.firebase.serialization`. Plain values and maps work through them too. The SDK's mapping annotations
@@ -56,11 +63,29 @@ platform boundary; the compiler will find them for you in step 3, but it helps t
    until you accept, with `@OptIn(UnsupportedOnJs::class)`, that the member does nothing on JS and Wasm, or fails where it
    must return a value. Storage's `putFile(Uri)` and `getFile(Uri)` are an example: the JS SDK uploads and downloads
    bytes, not files. The deprecation and opt-in messages, and each member's documentation, say what happens.
-8. **Members that are not declared at all.** A member bound to an Android type the other platforms cannot have (the
-   `Activity`-taking sign-in flows, the `Executor` overloads of the listener methods, `Parcelable`, `java.lang.Class`) or
-   to a feature the iOS and JS SDKs lack (Play Games sign-in, the Android-only messaging settings) is left out, so the
-   compiler reports it as unresolved rather than deprecated. Each module's `api/android-sdk/exclusions.txt` lists them with
-   the reason (`@platform` for the type, `@unavailable` for the feature).
+8. **Members of features the iOS and JS SDKs lack.** Play Games sign-in, the TOTP secret's parameters, the Android-only
+   messaging settings, storage's chunk retry time limit and upload resumption, `FirebaseMessagingService` and the streaming
+   `StreamResponse` are declared with an error-level deprecation whose message says the member is Android-only and where
+   the call belongs (`androidMain`), so common code using one fails with that message. They are listed in each module's
+   `api/android-sdk/exclusions.txt` as `@unavailable` and left out of the coverage count.
+9. **Members bound to an Android or JVM type the other platforms cannot have.** The `Activity`-taking sign-in flows and
+   listener overloads, the `Executor` overloads of the listeners and continuations, the `Parcelable` members
+   (`describeContents`, `writeToParcel`, `CREATOR`), `MultiFactorInfo.toJson()` (`org.json.JSONObject`),
+   `StorageException.fromErrorStatus` (Play Services `Status`), `HttpsCallableReference.stream()` (a Reactive Streams
+   `Publisher`), the pipeline API's protobuf `Value` members, `StreamDownloadTask` and the `ContentProvider` and `Activity`
+   subclasses the SDK registers in the manifest are declared the way `Timestamp(Date)` is (item 2): through error-deprecated
+   stand-ins for the type (`android.app.Activity`, `java.util.concurrent.Executor`, `android.os.Parcel`, ...), so common
+   code using one fails with a message saying the member is Android/JVM-only and what to use instead, and Android code in
+   `androidMain` keeps calling it. Each module's `api/android-sdk/exclusions.txt` lists them as `@platform`, with the
+   type. Members the Android SDK itself deprecates (`setPersistenceEnabled`, `updateEmail`, `fetchSignInMethodsForEmail`,
+   ...) are declared with the SDK's deprecation where they work on every platform, and with an error where they are
+   Android-only (the `Activity`-taking `verifyPhoneNumber`, `send(RemoteMessage)`, `setIndexConfiguration`).
+
+   `KClass.java` and `javaClass`, the JVM standard library's way to the `java.lang.Class` those members take, are declared
+   the same way, so `toObject(Book::class.java)` reports two deprecations rather than an unresolved `java`.
+
+   Nothing public in the Android SDK's `api.txt` is left undeclared, except members the SDK hides from apps (`@hide`), so an
+   unresolved reference in migrated code means a type or member that is not Firebase's.
 
 Everything else, including every listener, continuation, builder and static accessor, is available with the same
 signature. Each module lists exactly which Android SDK members it provides in its `api/android-sdk-compat.txt` (for
@@ -248,7 +273,8 @@ there is no default configuration. `getApplicationContext()` returns the applica
 a placeholder `Context` elsewhere.
 
 One group of members has no multiplatform replacement: the `Parcelable` members of `Timestamp` (`writeToParcel`,
-`describeContents`, `CREATOR`) are not declared. See the checklist.
+`describeContents`, `CREATOR`) are declared through the `android.os.Parcel` and `Parcelable` stand-ins and fail with an error
+saying so (a `Timestamp` maps as a Firestore timestamp through kotlinx.serialization instead). See the checklist.
 
 > Code left in `androidMain` never sees the deprecations: the Android compilation binds to the Firebase Android SDK's own
 > classes, where `Timestamp(Date)` and the others are the real, undeprecated members.
@@ -280,12 +306,13 @@ class BookRepository(private val firestore: FirebaseFirestore) {
 
 ```
 e: BookRepository.kt: 'fun set(data: Any): Task<Nothing?>' is deprecated. set maps a custom class with the Android SDK's reflection, which only exists on Android and the JVM; setData maps a @Serializable class, or a plain map, with kotlinx.serialization on every platform
-e: BookRepository.kt: Unresolved reference 'toObject' on receiver of type 'DocumentSnapshot'.
-e: BookRepository.kt: Unresolved reference 'java' on receiver of type 'KClass<Book>'.
+e: BookRepository.kt: 'fun <T> toObject(valueType: Class<T>): T?' is deprecated. Maps the class with the Android SDK's reflection, which only exists on Android and the JVM; the reified toObject<T>(), toObjects<T>(), getField<T>() and dataObjects<T>() in com.google.firebase.serialization map a @Serializable class with kotlinx.serialization on every platform
+e: BookRepository.kt: 'val <T : Any> KClass<T>.java: Class<T>' is deprecated. KClass.java and javaClass are JVM-only: they produce a java.lang.Class, which only the Firebase Android SDK's reflective members take; the reified reads in com.google.firebase.serialization (toObject<T>(), toObjects<T>(), getField<T>(), getValue<T>()) map a @Serializable class with kotlinx.serialization on every platform
 ```
 
-The write is deprecated with the message above; the class-taking read is unresolved, because neither `toObject(Class)`
-nor `Book::class.java` exists off the JVM. Once those are fixed the annotation gets its warning:
+All three are deprecations naming the replacement; the read reports its argument as well, because `Book::class.java`
+does not exist off the JVM, and the one replacement removes the last two errors. Once those are fixed the annotation gets
+its warning:
 
 ```
 w: BookRepository.kt: 'annotation class PropertyName : Annotation' is deprecated. Only the Android SDK's reflective mapping reads @PropertyName; kotlinx.serialization's @SerialName names the property on every platform.

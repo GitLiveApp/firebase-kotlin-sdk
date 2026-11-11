@@ -66,7 +66,7 @@ internal class MultiFactorResolverImpl(val ios: FIRMultiFactorResolver, override
     }
 }
 
-internal class TotpSecretImpl(val ios: FIRTOTPSecret) : TotpSecret {
+internal class TotpSecretImpl(val ios: FIRTOTPSecret) : TotpSecretBase() {
     override val sharedSecretKey: String get() = ios.sharedSecretKey()
 
     override fun generateQrCodeUrl(accountName: String, issuer: String): String = ios.generateQRCodeURLWithAccountName(accountName, issuer)

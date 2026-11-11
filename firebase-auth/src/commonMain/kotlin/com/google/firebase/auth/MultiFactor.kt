@@ -4,7 +4,12 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.TO_JSON_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.auth.TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_QR_CODE_URL_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_SECRET_PARAMETERS_ANDROID_ONLY
 
 /**
  * The multi-factor enrollment of a user, mirroring `com.google.firebase.auth.MultiFactor`: enrolls a second factor from
@@ -34,9 +39,15 @@ public expect abstract class MultiFactorAssertion() {
 }
 
 /**
- * An enrolled second factor, mirroring `com.google.firebase.auth.MultiFactorInfo`. Its JSON form is Android-only.
+ * An enrolled second factor, mirroring `com.google.firebase.auth.MultiFactorInfo`. Its JSON form, [toJson], is Android-only
+ * and declared through the error-deprecated `org.json.JSONObject` stand-in.
  */
 public expect abstract class MultiFactorInfo() {
+    /** Android only: the factor as JSON. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TO_JSON_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public open fun toJson(): org.json.JSONObject
+
     public abstract val displayName: String?
 
     /** When the factor was enrolled, in milliseconds since the epoch. */
@@ -107,6 +118,10 @@ public expect class PhoneMultiFactorGenerator() {
 
 /** A verified TOTP factor, mirroring `com.google.firebase.auth.TotpMultiFactorAssertion`. */
 public expect class TotpMultiFactorAssertion : MultiFactorAssertion {
+    /** Android only: the iOS and JS SDKs only create assertions through [TotpMultiFactorGenerator]. */
+    @Deprecated(TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public constructor(oneTimePassword: String, secret: TotpSecret, enrollmentId: String)
+
     override val factorId: String
 }
 
@@ -129,7 +144,8 @@ public expect class TotpMultiFactorGenerator {
 /**
  * A TOTP secret to enroll an authenticator app with, mirroring `com.google.firebase.auth.TotpSecret`.
  *
- * Not mirrored: the secret's parameters and session, which the iOS SDK does not expose (see `api/android-sdk/exclusions.txt`).
+ * The secret's parameters and session are Android-only, as the iOS SDK does not expose them (see `api/android-sdk/exclusions.txt`):
+ * they are declared with an error-level deprecation that says so, and Android code in `androidMain` reads them as before.
  */
 public expect interface TotpSecret {
     /** The shared secret, to enter in the authenticator app by hand. */
@@ -140,4 +156,33 @@ public expect interface TotpSecret {
 
     /** Opens [qrCodeUrl] in the authenticator app. */
     public fun openInOtpApp(qrCodeUrl: String)
+
+    /** Android only: opens [qrCodeUrl] in the authenticator app from [activity], or [fallbackUrl] when there is none. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY, ReplaceWith("openInOtpApp(qrCodeUrl)"), DeprecationLevel.ERROR)
+    public fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: android.app.Activity)
+
+    /** Android only: the interval, in seconds, after which the one-time password changes. */
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val codeIntervalSeconds: Int
+
+    /** Android only: the number of digits of a one-time password. */
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val codeLength: Int
+
+    /** Android only: the time by which enrollment must be completed, in seconds since the epoch. */
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val enrollmentCompletionDeadline: Long
+
+    /** Android only: the hashing algorithm of the one-time passwords. */
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val hashAlgorithm: String
+
+    /** Android only: the enrollment session this secret belongs to. */
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public val sessionInfo: String
+
+    /** Android only: a QR code URL without an account name or issuer, which the iOS SDK requires. */
+    @Deprecated(TOTP_QR_CODE_URL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun generateQrCodeUrl(): String
 }

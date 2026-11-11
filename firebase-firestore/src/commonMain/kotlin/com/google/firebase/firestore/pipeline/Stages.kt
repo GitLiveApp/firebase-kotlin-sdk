@@ -4,6 +4,7 @@
 
 package com.google.firebase.firestore.pipeline
 
+import dev.gitlive.firebase.firestore.PROTO_VALUE_ANDROID_ONLY
 import dev.gitlive.firebase.firestore.INTERNAL_CONSTRUCTOR
 import dev.gitlive.firebase.firestore.internal.pipeline.OptionValues
 import dev.gitlive.firebase.firestore.internal.pipeline.selections
@@ -35,6 +36,11 @@ protected constructor(
     public fun withOption(key: String, value: Double): T = self(options + (key to value))
 
     public fun withOption(key: String, value: Field): T = self(options + (key to value))
+
+    /** Android/JVM only: an option given as the SDK's protobuf value; common code uses a typed overload. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(PROTO_VALUE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun withOption(key: String, value: com.google.firestore.v1.Value): T = throw UnsupportedOperationException(PROTO_VALUE_ANDROID_ONLY)
 
     public companion object
 }

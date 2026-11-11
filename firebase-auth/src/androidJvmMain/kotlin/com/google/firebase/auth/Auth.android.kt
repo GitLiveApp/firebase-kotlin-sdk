@@ -4,11 +4,24 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY
+import dev.gitlive.firebase.auth.AUTO_RETRIEVED_SMS_ANDROID_ONLY
+import dev.gitlive.firebase.auth.FORCE_RECAPTCHA_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PENDING_AUTH_RESULT_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PHONE_ACTIVITY_ANDROID_ONLY
+import dev.gitlive.firebase.auth.PHONE_TIMEOUT_ANDROID_ONLY
+import dev.gitlive.firebase.auth.VERIFY_PHONE_NUMBER_DEPRECATED
+import dev.gitlive.firebase.auth.TO_JSON_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY
+import org.json.JSONObject
 import android.app.Activity
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
+import dev.gitlive.firebase.auth.TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_QR_CODE_URL_ANDROID_ONLY
+import dev.gitlive.firebase.auth.TOTP_SECRET_PARAMETERS_ANDROID_ONLY
 import dev.gitlive.firebase.auth.stub
 import java.util.concurrent.TimeUnit
 
@@ -60,11 +73,13 @@ public actual class FirebaseAuth private constructor() {
     public actual fun updateCurrentUser(user: FirebaseUser): Task<Nothing?> = stub()
     public actual fun verifyPasswordResetCode(code: String): Task<String> = stub()
 
-    /** Android only: signs in with [provider] through a web flow started from [activity]. */
-    public fun startActivityForSignInWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("signInWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForSignInWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
 
     /** Android only: the result of a provider sign-in flow interrupted by the app being recreated, or null. */
-    public val pendingAuthResult: Task<AuthResult>? get() = stub()
+    @Deprecated(PENDING_AUTH_RESULT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val pendingAuthResult: Task<AuthResult>? get() = stub()
 
     public actual fun interface AuthStateListener {
         public actual fun onAuthStateChanged(auth: FirebaseAuth)
@@ -86,11 +101,11 @@ public actual class FirebaseAuth private constructor() {
 public actual abstract class FirebaseAuthSettings actual constructor() {
     public actual abstract fun setAppVerificationDisabledForTesting(disabled: Boolean)
 
-    /** Android only. */
-    public abstract fun forceRecaptchaFlowForTesting(forceRecaptchaFlow: Boolean)
+    @Deprecated(FORCE_RECAPTCHA_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun forceRecaptchaFlowForTesting(forceRecaptchaFlow: Boolean): Unit = stub()
 
-    /** Android only. */
-    public abstract fun setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber: String, smsCode: String)
+    @Deprecated(AUTO_RETRIEVED_SMS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber: String, smsCode: String): Unit = stub()
 }
 
 public actual interface UserInfo {
@@ -127,11 +142,13 @@ public actual abstract class FirebaseUser actual constructor() : UserInfo {
     public actual fun verifyBeforeUpdateEmail(newEmail: String): Task<Nothing?> = stub()
     public actual fun verifyBeforeUpdateEmail(newEmail: String, actionCodeSettings: ActionCodeSettings?): Task<Nothing?> = stub()
 
-    /** Android only: links [provider] through a web flow started from [activity]. */
-    public fun startActivityForLinkWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("linkWithCredential(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForLinkWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
 
-    /** Android only: re-authenticates with [provider] through a web flow started from [activity]. */
-    public fun startActivityForReauthenticateWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("reauthenticateAndRetrieveData(credential)"), DeprecationLevel.ERROR)
+    public actual fun startActivityForReauthenticateWithProvider(activity: Activity, provider: FederatedAuthProvider): Task<AuthResult> = stub()
 }
 
 public actual class UserProfileChangeRequest private constructor() {
@@ -313,13 +330,13 @@ public actual class OAuthProvider private constructor() : FederatedAuthProvider(
 }
 
 public actual class PhoneAuthProvider private constructor() {
-    /** Android only: verifies [phoneNumber] with the deprecated instance API. */
-    @Deprecated("Use PhoneAuthProvider.verifyPhoneNumber(PhoneAuthOptions)")
-    public fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: TimeUnit, activity: Activity, callbacks: OnVerificationStateChangedCallbacks): Unit = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public actual fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: TimeUnit, activity: Activity, callbacks: OnVerificationStateChangedCallbacks): Unit = stub()
 
-    /** Android only: verifies [phoneNumber] with the deprecated instance API. */
-    @Deprecated("Use PhoneAuthProvider.verifyPhoneNumber(PhoneAuthOptions)")
-    public fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: TimeUnit, activity: Activity, callbacks: OnVerificationStateChangedCallbacks, forceResendingToken: ForceResendingToken): Unit = stub()
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(VERIFY_PHONE_NUMBER_DEPRECATED, level = DeprecationLevel.ERROR)
+    public actual fun verifyPhoneNumber(phoneNumber: String, timeout: Long, unit: TimeUnit, activity: Activity, callbacks: OnVerificationStateChangedCallbacks, forceResendingToken: ForceResendingToken): Unit = stub()
 
     public actual class ForceResendingToken private constructor()
 
@@ -363,11 +380,13 @@ public actual class PhoneAuthOptions private constructor() {
         public actual fun requireSmsValidation(requireSmsValidation: Boolean): Builder = stub()
         public actual fun build(): PhoneAuthOptions = stub()
 
-        /** Android only: the activity the verification (and its reCAPTCHA fallback) is attached to; required. */
-        public fun setActivity(activity: Activity): Builder = stub()
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_ACTIVITY_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun setActivity(activity: Activity): Builder = stub()
 
-        /** Android only: how long to wait for SMS auto-retrieval before [PhoneAuthProvider.OnVerificationStateChangedCallbacks.onCodeAutoRetrievalTimeOut]. */
-        public fun setTimeout(timeout: Long?, unit: TimeUnit): Builder = stub()
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(PHONE_TIMEOUT_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual fun setTimeout(timeout: Long?, unit: TimeUnit): Builder = stub()
     }
 
     public actual companion object {
@@ -392,6 +411,10 @@ public actual abstract class MultiFactorAssertion actual constructor() {
 }
 
 public actual abstract class MultiFactorInfo actual constructor() {
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TO_JSON_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual open fun toJson(): JSONObject = stub()
+
     public actual abstract val displayName: String?
     public actual abstract val enrollmentTimestamp: Long
     public actual abstract val factorId: String
@@ -442,6 +465,11 @@ public actual class PhoneMultiFactorGenerator actual constructor() {
 }
 
 public actual class TotpMultiFactorAssertion private constructor() : MultiFactorAssertion() {
+    @Deprecated(TOTP_ASSERTION_CONSTRUCTOR_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual constructor(oneTimePassword: String, secret: TotpSecret, enrollmentId: String) : this() {
+        stub()
+    }
+
     actual override val factorId: String get() = stub()
 }
 
@@ -466,26 +494,28 @@ public actual interface TotpSecret {
     public actual fun generateQrCodeUrl(accountName: String, issuer: String): String
     public actual fun openInOtpApp(qrCodeUrl: String)
 
-    /** Android only. */
-    public val codeIntervalSeconds: Int
+    // The Android-only parameters, deprecated with an error so that common code cannot call them; Android code binds to the real interface.
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val codeIntervalSeconds: Int
 
-    /** Android only. */
-    public val codeLength: Int
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val codeLength: Int
 
-    /** Android only. */
-    public val enrollmentCompletionDeadline: Long
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val enrollmentCompletionDeadline: Long
 
-    /** Android only. */
-    public val hashAlgorithm: String
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val hashAlgorithm: String
 
-    /** Android only. */
-    public val sessionInfo: String
+    @Deprecated(TOTP_SECRET_PARAMETERS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual val sessionInfo: String
 
-    /** Android only. */
-    public fun generateQrCodeUrl(): String
+    @Deprecated(TOTP_QR_CODE_URL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun generateQrCodeUrl(): String
 
-    /** Android only. */
-    public fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: Activity)
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TOTP_OPEN_WITH_ACTIVITY_ANDROID_ONLY, ReplaceWith("openInOtpApp(qrCodeUrl)"), DeprecationLevel.ERROR)
+    public actual fun openInOtpApp(qrCodeUrl: String, fallbackUrl: String, activity: Activity)
 }
 
 public actual open class FirebaseAuthException actual constructor(errorCode: String, message: String) : FirebaseException(message) {

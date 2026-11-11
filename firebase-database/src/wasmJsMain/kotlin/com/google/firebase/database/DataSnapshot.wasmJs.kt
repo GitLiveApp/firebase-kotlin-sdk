@@ -13,12 +13,20 @@ import dev.gitlive.firebase.externals.jsTypeOf
 import dev.gitlive.firebase.externals.toList
 import dev.gitlive.firebase.externals.json
 import dev.gitlive.firebase.database.externals.DataSnapshot as JsDataSnapshot
+import dev.gitlive.firebase.database.REFLECTIVE_READ
 
 /**
  * @property js The underlying Firebase JS SDK object.
- * @property database The JS SDK database the snapshot belongs to.
  */
-public actual class DataSnapshot internal constructor(public val js: JsDataSnapshot, public val database: Database) {
+public actual class DataSnapshot internal constructor(public val js: JsDataSnapshot, internal val database: Database) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     public actual fun exists(): Boolean = rethrow { js.exists() }
     public actual val key: String? get() = js.key
     public actual val ref: DatabaseReference get() = DatabaseReference(js.ref, database)
@@ -58,6 +66,14 @@ public actual class DataSnapshot internal constructor(public val js: JsDataSnaps
  * @property root The value being edited, as the JS SDK's transaction receives it and returns it.
  */
 public actual class MutableData internal constructor(internal val root: Root, private val path: List<String>, public actual val key: String?) {
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(t: GenericTypeIndicator<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(REFLECTIVE_READ, ReplaceWith("getValue<T>()", "com.google.firebase.serialization.getValue"), DeprecationLevel.ERROR)
+    public actual fun <T> getValue(valueType: java.lang.Class<T>): T? = throw UnsupportedOperationException(REFLECTIVE_READ)
     internal constructor(current: JsAny?, key: String?) : this(Root(current), emptyList(), key)
 
     /** The JS value being edited. */

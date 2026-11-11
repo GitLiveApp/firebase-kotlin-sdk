@@ -48,7 +48,7 @@ com.google.firebase.perf.metrics.HttpMetric
   OK    static int MAX_TRACE_CUSTOM_ATTRIBUTES
   OK    static int MAX_TRACE_NAME_LENGTH
 com.google.firebase.perf.metrics.Trace
-  PLAT  int describeContents()
+  PLAT  int describeContents()  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Trace is not parcelled on the other platforms]
   OK    String getAttribute(String)
   OK    Map getAttributes()
   OK    long getLongMetric(String)
@@ -58,8 +58,8 @@ com.google.firebase.perf.metrics.Trace
   OK    void removeAttribute(String)
   OK    void start()
   OK    void stop()
-  PLAT  void writeToParcel(Parcel, int)
-  PLAT  static Creator CREATOR
+  PLAT  void writeToParcel(Parcel, int)  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Trace is not parcelled on the other platforms]
+  PLAT  static Creator CREATOR  [deprecated: describeContents, writeToParcel and CREATOR implement android.os.Parcelable, which is Android-only; a Trace is not parcelled on the other platforms]
   OK    static int MAX_ATTRIBUTE_KEY_LENGTH
   OK    static int MAX_ATTRIBUTE_VALUE_LENGTH
   OK    static int MAX_TRACE_CUSTOM_ATTRIBUTES

@@ -311,6 +311,105 @@ class SourceCompatReportTest {
     }
 
     @Test
+    fun erasesBoundedTypeVariablesToTheirBoundAndAcceptsUnresolvedTypes() {
+        val apiTxt = """
+            package com.google.firebase.test {
+              public abstract class Options<T extends com.google.firebase.test.Options<T>> {
+                method public final T with(String key, boolean value);
+                method public <X extends java.lang.Throwable> T getResult(Class<X!>) throws X;
+                method public <U> U get(String key);
+                field public static final error.NonExistentClass COSINE;
+              }
+              public abstract class Task<ResultT extends com.google.firebase.test.Task.ProvideError> {
+                method public ResultT getSnapshot();
+                method public void set(ResultT value);
+                method public void put(ResultT value);
+              }
+              public final class Box<U, T extends U> {
+                method public T get();
+                method public void put(T value);
+                method public <V extends T> V pick();
+              }
+              public final class Chain<U extends com.google.firebase.test.Options<U>, T extends U> {
+                method public T first();
+                method public <V extends T> V pick();
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public abstract class com/google/firebase/test/Options {
+            	public final fun with (Ljava/lang/String;Z)Lcom/google/firebase/test/Options;
+            	public final fun getResult (Ljava/lang/Class;)Lcom/google/firebase/test/Options;
+            	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
+            	public static final field COSINE Lcom/google/firebase/test/Options${'$'}DistanceMeasure;
+            }
+
+            public abstract class com/google/firebase/test/Task {
+            	public fun getSnapshot ()Lcom/google/firebase/test/Task${'$'}ProvideError;
+            	public fun set (Lcom/google/firebase/test/Task${'$'}ProvideError;)V
+            	public fun put (Ljava/lang/Object;)V
+            }
+
+            public final class com/google/firebase/test/Box {
+            	public final fun get ()Ljava/lang/Object;
+            	public final fun put (Ljava/lang/Object;)V
+            	public final fun pick ()Ljava/lang/Object;
+            }
+
+            public final class com/google/firebase/test/Chain {
+            	public final fun first ()Lcom/google/firebase/test/Options;
+            	public final fun pick ()Lcom/google/firebase/test/Options;
+            }
+        """.trimIndent()
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), emptyList())
+        assertTrue(report.contains("OK    T with(String, boolean)"), report) // T erases to its bound, Options
+        assertTrue(report.contains("OK    T getResult(Class)"), report) // the class's T, next to the method's own X
+        assertTrue(report.contains("OK    U get(String)"), report) // an unbounded method type variable erases to Object
+        assertTrue(report.contains("OK    static NonExistentClass COSINE"), report) // a type metalava could not resolve accepts any type
+        assertTrue(report.contains("OK    ResultT getSnapshot()"), report)
+        assertTrue(report.contains("OK    void set(ResultT)"), report)
+        assertTrue(report.contains("MISS  void put(ResultT)"), report) // Object is not the erasure of a bounded type variable
+        assertTrue(report.contains("OK    T get()"), report) // T extends U, which is unbounded: both erase to Object
+        assertTrue(report.contains("OK    void put(T)"), report)
+        assertTrue(report.contains("OK    V pick()"), report) // a method type variable bounded by a class type variable
+        assertTrue(report.contains("OK    T first()"), report) // T extends U extends Options: erases to Options
+        assertTrue(report.contains("Chain\n  OK    T first()\n  OK    V pick()"), report) // V extends T extends U extends Options
+    }
+
+    @Test
+    fun showsTheDeprecationOfAnExcludedMemberTheLayerDeclares() {
+        val apiTxt = """
+            package com.google.firebase.test {
+              public final class Messaging {
+                method public boolean deliveryMetricsExportToBigQueryEnabled();
+                method public void setDeliveryMetricsExportToBigQuery(boolean);
+                method public com.google.android.gms.tasks.Task<Void!> register();
+                method public String getToken();
+              }
+            }
+        """.trimIndent()
+        val dump = """
+            public final class com/google/firebase/test/Messaging {
+            	public final fun deliveryMetricsExportToBigQueryEnabled ()Z  // deprecated: Android-only; a call belongs in androidMain
+            	public final fun setDeliveryMetricsExportToBigQuery (Z)V  // deprecated: Android-only; a call belongs in androidMain
+            	public final fun register ()Lcom/google/android/gms/tasks/Task;  // deprecated: not available yet
+            	public final fun getToken ()Ljava/lang/String;
+            }
+        """.trimIndent()
+        val exclusions = listOf(
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#deliveryMetricsExportToBigQueryEnabled"), "UNAV"),
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#setDeliveryMetricsExportToBigQuery"), "UNAV"),
+            Exclusion(Regex("com\\.google\\.firebase\\.test\\.Messaging#register"), null),
+        )
+        val report = SourceCompatReport.generate("test", "main", AndroidSdkApiTxtParser.parse(apiTxt), BcvApiParser.parse(dump), exclusions)
+        assertTrue(report.contains("UNAV  boolean deliveryMetricsExportToBigQueryEnabled()  [deprecated: Android-only; a call belongs in androidMain]"), report)
+        assertTrue(report.contains("UNAV  void setDeliveryMetricsExportToBigQuery(boolean)  [deprecated: Android-only; a call belongs in androidMain]"), report)
+        assertTrue(report.contains("OMIT  Task register()  [deprecated: not available yet]"), report) // still counted as omitted
+        assertTrue(report.contains("OK    String getToken()"), report)
+        assertTrue(report.contains("# 50% of 2 public members available (1 identical, 0 mapped, 0 missing, 1 omitted)"), report)
+    }
+
+    @Test
     fun reportsMissingClasses() {
         val report = SourceCompatReport.generate(
             module = "test",

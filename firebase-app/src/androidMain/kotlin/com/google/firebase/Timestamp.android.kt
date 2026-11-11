@@ -6,6 +6,7 @@ package com.google.firebase
 
 import dev.gitlive.firebase.TIMESTAMP_OF_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TIMESTAMP_OF_INSTANT_ANDROID_ONLY
+import dev.gitlive.firebase.TIMESTAMP_PARCELABLE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_DATE_ANDROID_ONLY
 import dev.gitlive.firebase.TO_INSTANT_ANDROID_ONLY
 import dev.gitlive.firebase.stub
@@ -37,8 +38,20 @@ public actual class Timestamp actual constructor(seconds: Long, nanoseconds: Int
     @Deprecated(TO_INSTANT_ANDROID_ONLY, ReplaceWith("toKotlinInstant()", "com.google.firebase.toKotlinInstant"), DeprecationLevel.ERROR)
     public actual fun toInstant(): java.time.Instant = stub()
 
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun describeContents(): Int = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = stub()
+
     public actual companion object {
         @JvmStatic
         public actual fun now(): Timestamp = stub()
+
+        @Suppress("DEPRECATION_ERROR")
+        @Deprecated(TIMESTAMP_PARCELABLE_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+        public actual val CREATOR: android.os.Parcelable.Creator<Timestamp> get() = stub()
     }
 }

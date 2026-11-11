@@ -89,6 +89,7 @@ fun Project.stripHeaderStubs(
             val stubs = stubDirs.flatMap { dir -> dir.walkTopDown().filter { it.isFile && it.extension == "class" }.toList() }
                 .filter { !isKept(it.relativeTo(destination).invariantSeparatorsPath, jvm = !android) }
             val classes = stubs.map { readMembers(it.readBytes()) }
+            for (holder in classes) holder.defaultImplsOf?.let { owner -> classes.firstOrNull { it.name == owner }?.applyPropertyDeprecations(holder.propertyDeprecations) }
             val tolerated = if (android) emptySet() else (jvmMissingMembers + jvmMissingMembersFile.entries()).toSet()
             verifyHeaderStubs(classes, references.files.filter { it.isFile }, tolerated)
             dump.get().asFile.also { it.parentFile.mkdirs() }.writeText(dumpStubs(classes))
@@ -150,6 +151,12 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     /** Names of the class's own non-public fields: they shadow an inherited public constant of the same name. */
     val hiddenFields = mutableSetOf<String>()
 
+    /**
+     * The uncallable deprecations of the class's properties, keyed by getter name: Kotlin keeps a property's annotations
+     * on a synthetic `getFoo${'$'}annotations` method (in the `${'$'}DefaultImpls` class for an interface), not on the accessors.
+     */
+    val propertyDeprecations = mutableMapOf<String, String>()
+
     override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String?, interfaces: Array<out String>?) {
         this.name = name
         this.access = access
@@ -162,6 +169,12 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
     override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
         if (access and (Opcodes.ACC_PUBLIC or Opcodes.ACC_PROTECTED) == 0 || name == "<clinit>") return null
         if (access and Opcodes.ACC_SYNTHETIC != 0) {
+            if (name.endsWith("\$annotations")) {
+                val getter = name.removeSuffix("\$annotations")
+                return object : MethodVisitor(Opcodes.ASM9) {
+                    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? = deprecationVisitor(descriptor) { propertyDeprecations[getter] = it }
+                }
+            }
             // An inline function with a reified type parameter is synthetic (Java cannot call it) but is real Kotlin API:
             // it is dumped for the source-compatibility report, and not verified as it is inlined into its callers.
             if (access and Opcodes.ACC_BRIDGE == 0 && !name.contains('$') && name != "<init>") reifiedInlineMethods += Member(name, descriptor, access)
@@ -185,13 +198,27 @@ private class ClassMembers : ClassVisitor(Opcodes.ASM9) {
         }
     }
 
+    override fun visitEnd() = applyPropertyDeprecations(propertyDeprecations)
+
+    /** Marks the accessors of the properties in [deprecations] (getter name to message) as uncallable, as the property is. */
+    fun applyPropertyDeprecations(deprecations: Map<String, String>) {
+        for ((getter, message) in deprecations) {
+            val setter = "set" + getter.removePrefix("get").removePrefix("is")
+            for (method in methods) if ((method.name == getter || method.name == setter) && method.deprecation == null) method.deprecation = message
+        }
+    }
+
+    /** The interface whose annotated properties this `${'$'}DefaultImpls` class holds, or null. */
+    val defaultImplsOf: String? get() = name.removeSuffix("\$DefaultImpls").takeIf { it != name }
+
     /**
      * Kotlin-only classes and members that have no counterpart on the real (Java) class and are never reached at runtime,
      * including the non-public classes of plain common code (private implementations, lambdas), which only its own
      * stripped code uses, and the synthetic parts of a multifile facade (`Facade__PartKt`), whose members the facade
      * itself declares.
      */
-    val isKotlinOnly get() = name.endsWith("\$Companion") || name.contains("\$WhenMappings") || name.contains("\$EntriesMappings") || access and Opcodes.ACC_PUBLIC == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || isAnonymous
+    val isKotlinOnly get() = name.endsWith("\$Companion") || name.contains("\$WhenMappings") || name.contains("\$EntriesMappings") || access and Opcodes.ACC_PUBLIC == 0 || access and Opcodes.ACC_SYNTHETIC != 0 || isAnonymous ||
+        (defaultImplsOf != null && methods.isEmpty() && fields.isEmpty()) // an interface's annotation holder, with no default implementations
 
     /** An anonymous object or lambda class (`Outer$fn$1`), an implementation detail of plain common code. */
     val isAnonymous get() = anonymousClass.containsMatchIn(name)

@@ -4,6 +4,7 @@
 
 package com.google.firebase
 
+import dev.gitlive.firebase.RECAPTCHA_SITE_KEY_DEPRECATED
 import android.content.Context
 import kotlin.js.json
 import dev.gitlive.firebase.externals.FirebaseApp as JsFirebaseApp
@@ -133,6 +134,10 @@ public actual class FirebaseOptions internal constructor(
         public actual fun setProjectId(projectId: String?): Builder = apply { this.projectId = projectId }
         public actual fun setStorageBucket(storageBucket: String?): Builder = apply { this.storageBucket = storageBucket }
         public actual fun setGaTrackingId(gaTrackingId: String?): Builder = apply { this.gaTrackingId = gaTrackingId }
+
+        /** Deprecated in the Android SDK, which no longer reads the key; kept for signature parity and ignored. */
+        @Deprecated(RECAPTCHA_SITE_KEY_DEPRECATED)
+        public actual fun setRecaptchaSiteKey(recaptchaSiteKey: String?): Builder = this
 
         /** Sets the auth domain (JS only). */
         public fun setAuthDomain(authDomain: String?): Builder = apply { this.authDomain = authDomain }

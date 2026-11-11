@@ -4,6 +4,7 @@
 
 package com.google.firebase.auth
 
+import dev.gitlive.firebase.auth.ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 
@@ -24,7 +25,8 @@ public expect interface UserInfo {
  * A signed-in user, mirroring `com.google.firebase.auth.FirebaseUser` from the Firebase Android SDK: its profile and
  * provider data, and the account operations that need a signed-in user.
  *
- * Not mirrored: the `Activity`-bound provider flows (see `api/android-sdk/exclusions.txt`).
+ * The `Activity`-bound provider flows are Android-only, declared through the error-deprecated `android.app.Activity` stand-in
+ * (see `api/android-sdk/exclusions.txt`).
  */
 public expect abstract class FirebaseUser() : UserInfo {
     /** The tenant the user signed in to, or null. */
@@ -68,6 +70,16 @@ public expect abstract class FirebaseUser() : UserInfo {
 
     /** Unlinks the provider [provider] and completes with the updated user. */
     public fun unlink(provider: String): Task<AuthResult>
+
+    /** Android only: links [provider] through a web flow started from [activity]; use [linkWithCredential] with the provider's credential. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("linkWithCredential(credential)"), DeprecationLevel.ERROR)
+    public fun startActivityForLinkWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult>
+
+    /** Android only: re-authenticates with [provider] through a web flow started from [activity]; use [reauthenticateAndRetrieveData]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(ACTIVITY_PROVIDER_FLOW_ANDROID_ONLY, ReplaceWith("reauthenticateAndRetrieveData(credential)"), DeprecationLevel.ERROR)
+    public fun startActivityForReauthenticateWithProvider(activity: android.app.Activity, provider: FederatedAuthProvider): Task<AuthResult>
 
     /** Sets the email address; requires a recent sign-in. */
     @Deprecated("Use verifyBeforeUpdateEmail instead", ReplaceWith("verifyBeforeUpdateEmail(email)"))

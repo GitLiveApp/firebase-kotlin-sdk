@@ -4,6 +4,7 @@
 
 package com.google.firebase.analytics
 
+import dev.gitlive.firebase.analytics.SET_CURRENT_SCREEN_DEPRECATED
 import android.content.Context
 import android.os.Bundle
 import com.google.android.gms.tasks.Task
@@ -14,6 +15,10 @@ import dev.gitlive.firebase.analytics.internal.compatAnalytics
 /** Real code over the platform SDK through [native]; see the common declaration. */
 public actual class FirebaseAnalytics private constructor(internal actual val native: NativeAnalytics) {
     public actual fun logEvent(name: String, params: Bundle?): Unit = native.logEvent(name, params)
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(SET_CURRENT_SCREEN_DEPRECATED, level = DeprecationLevel.ERROR)
+    public actual fun setCurrentScreen(activity: android.app.Activity, screenName: String?, screenClassOverride: String?): Unit = throw UnsupportedOperationException(SET_CURRENT_SCREEN_DEPRECATED)
 
     public actual fun setDefaultEventParameters(parameters: Bundle?): Unit = native.setDefaultEventParameters(parameters)
 

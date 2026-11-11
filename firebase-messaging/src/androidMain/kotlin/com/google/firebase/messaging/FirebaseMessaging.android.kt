@@ -4,8 +4,13 @@
 
 package com.google.firebase.messaging
 
+import dev.gitlive.firebase.messaging.WRITE_TO_PARCEL_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.UPSTREAM_SEND_DECOMMISSIONED
 import android.net.Uri
 import com.google.android.gms.tasks.Task
+import dev.gitlive.firebase.messaging.DELIVERY_METRICS_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.NOTIFICATION_DELEGATION_ANDROID_ONLY
+import dev.gitlive.firebase.messaging.REGISTER_NOT_AVAILABLE
 import dev.gitlive.firebase.messaging.stub
 
 /*
@@ -17,11 +22,32 @@ public actual class FirebaseMessaging private constructor() {
     public actual fun deleteToken(): Task<Nothing?> = stub()
     public actual fun getToken(): Task<String> = stub()
 
+    @Deprecated(UPSTREAM_SEND_DECOMMISSIONED, level = DeprecationLevel.ERROR)
+    public actual fun send(message: RemoteMessage): Unit = stub()
+
     public actual fun subscribeToTopic(topic: String): Task<Nothing?> = stub()
     public actual fun unsubscribeFromTopic(topic: String): Task<Nothing?> = stub()
     public actual var isAutoInitEnabled: Boolean
         get() = stub()
         set(_) = stub()
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun deliveryMetricsExportToBigQueryEnabled(): Boolean = stub()
+
+    @Deprecated(DELIVERY_METRICS_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setDeliveryMetricsExportToBigQuery(enable: Boolean): Unit = stub()
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun isNotificationDelegationEnabled(): Boolean = stub()
+
+    @Deprecated(NOTIFICATION_DELEGATION_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun setNotificationDelegationEnabled(enable: Boolean): Task<Nothing?> = stub()
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun register(): Task<Nothing?> = stub()
+
+    @Deprecated(REGISTER_NOT_AVAILABLE, level = DeprecationLevel.ERROR)
+    public actual fun unregister(): Task<Nothing?> = stub()
 
     public actual companion object {
         @Deprecated("The registration token has no scope any more; getToken() returns the FCM token")
@@ -50,6 +76,10 @@ public actual class RemoteMessage private constructor() {
     @Deprecated("Upstream messaging through Firebase Cloud Messaging has been decommissioned")
     public actual val to: String? get() = stub()
     public actual val ttl: Int get() = stub()
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(WRITE_TO_PARCEL_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public actual fun writeToParcel(dest: android.os.Parcel, flags: Int): Unit = stub()
 
     public actual class Builder actual constructor(to: String) {
         public actual fun addData(key: String, value: String?): Builder = stub()

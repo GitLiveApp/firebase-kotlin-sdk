@@ -269,9 +269,8 @@ private fun aborting(update: (JsAny?) -> JsAny?, abort: JsAny): JsAny = js("(cur
 
 /**
  * @property js The underlying Firebase JS SDK object.
- * @property ref The reference the operations are registered on.
  */
-public actual class OnDisconnect internal constructor(public val js: JsOnDisconnect, public val ref: DatabaseReference) {
+public actual class OnDisconnect internal constructor(public val js: JsOnDisconnect, internal val ref: DatabaseReference) {
     @Deprecated(REFLECTIVE_WRITE, ReplaceWith("setData(value)", "com.google.firebase.serialization.setData"), DeprecationLevel.ERROR)
     public actual fun setValue(value: Any?): Task<Nothing?> = write { js.set(value.toJs()) }
 

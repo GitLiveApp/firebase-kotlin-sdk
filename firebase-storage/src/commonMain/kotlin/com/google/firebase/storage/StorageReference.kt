@@ -4,10 +4,12 @@
 
 package com.google.firebase.storage
 
+import dev.gitlive.firebase.storage.STREAM_DOWNLOAD_JVM_ONLY
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import dev.gitlive.firebase.storage.PUT_STREAM_JVM_ONLY
 import dev.gitlive.firebase.storage.GET_FILE_JVM_ONLY
+import dev.gitlive.firebase.storage.RESUME_UPLOAD_ANDROID_ONLY
 
 /**
  * A reference to an object or folder in Cloud Storage, as the Android SDK's `StorageReference`. Files are given as
@@ -91,6 +93,10 @@ public expect class StorageReference : Comparable<StorageReference> {
     /** Uploads the file at [uri] to this reference with [metadata]. Fails on JS, whose SDK cannot read a file by its URL. */
     public fun putFile(uri: Uri, metadata: StorageMetadata): UploadTask
 
+    /** Android only: resumes the upload session at [existingUploadUri]; the iOS and JS SDKs cannot resume a session. */
+    @Deprecated(RESUME_UPLOAD_ANDROID_ONLY, level = DeprecationLevel.ERROR)
+    public fun putFile(uri: Uri, metadata: StorageMetadata, existingUploadUri: Uri): UploadTask
+
     /** Downloads the object to the file at [destinationUri]. Fails on JS, whose SDK has no file downloads. */
     public fun getFile(destinationUri: Uri): FileDownloadTask
 
@@ -98,6 +104,16 @@ public expect class StorageReference : Comparable<StorageReference> {
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(GET_FILE_JVM_ONLY, ReplaceWith("getFile(Path(destinationFile.path))", "kotlinx.io.files.Path"), DeprecationLevel.ERROR)
     public fun getFile(destinationFile: java.io.File): FileDownloadTask
+
+    /** Android/JVM only: downloads to a `java.io.InputStream`; common code uses [getBytes], `getFile(Path)` or [getFile]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public fun getStream(): StreamDownloadTask
+
+    /** Android/JVM only: downloads to a `java.io.InputStream` read by [processor]; common code uses [getBytes], `getFile(Path)` or [getFile]. */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(STREAM_DOWNLOAD_JVM_ONLY, ReplaceWith("getBytes(maxDownloadSizeBytes)"), DeprecationLevel.ERROR)
+    public fun getStream(processor: StreamDownloadTask.StreamProcessor): StreamDownloadTask
 
     /** The downloads from this reference that have not completed; always empty on JS. */
     public val activeDownloadTasks: List<FileDownloadTask>

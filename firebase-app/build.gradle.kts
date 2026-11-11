@@ -64,6 +64,8 @@ kotlin {
         optIn.add("kotlin.time.ExperimentalTime")
         freeCompilerArgs.add("-Xexpect-actual-classes")
         freeCompilerArgs.add("-Xconsistent-data-class-copy-visibility")
+        // The error-deprecated stand-ins for KClass.java and javaClass live in kotlin, the standard library's package.
+        freeCompilerArgs.add("-Xallow-kotlin-package")
     }
     targets.configureEach {
         compilations.configureEach {
@@ -73,6 +75,7 @@ kotlin {
                         jvmTarget = JvmTarget.JVM_17
                     }
                     freeCompilerArgs.add("-Xexpect-actual-classes")
+                    freeCompilerArgs.add("-Xallow-kotlin-package")
                 }
             }
         }
@@ -212,7 +215,7 @@ tasks.withType<JavaCompile>().configureEach {
 // Android and the JVM (see buildSrc utils/HeaderStubs.kt): the real Firebase Android SDK / firebase-java-sdk /
 // kotlinx-coroutines-play-services classes and the platform's own types are used at runtime.
 stripHeaderStubs(
-    packageDirs = listOf("android/content", "android/net", "java/io", "java/net", "java/nio", "java/time", "java/util", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
+    packageDirs = listOf("android/app", "android/content", "android/database", "android/net", "android/os", "java/io", "java/lang", "java/net", "java/nio", "java/time", "java/util", "kotlin", "org/json", "com/google/android/gms", "com/google/firebase", "kotlinx/coroutines/tasks"),
     androidReferenceJars = files({
         val dependencies = configurations.findByName("releaseCompileClasspath")?.incoming?.artifactView {
             attributes.attribute(Attribute.of("artifactType", String::class.java), "android-classes-jar")
@@ -222,6 +225,9 @@ stripHeaderStubs(
     }),
     jvmReferenceJars = files({ configurations.findByName("jvmCompileClasspath")?.files ?: files() }),
     keepClasses = listOf("com/google/firebase/TimestampInstantKt.class"),
+    // firebase-java-sdk has no android.os.Parcel: the stand-in is shipped on the JVM so that the modules whose JVM code is real
+    // (messaging, perf) can declare the SDK's writeToParcel(Parcel, Int) there too.
+    jvmKeepClasses = listOf("android/os/Parcel.class"),
     // FirebaseFormat, the multiplatform counterpart of the Android SDK's (internal) class mappers.
     keepPackageDirs = listOf("com/google/firebase/serialization"),
 )

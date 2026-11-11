@@ -5,6 +5,7 @@
 package com.google.firebase
 
 import android.content.Context
+import dev.gitlive.firebase.RECAPTCHA_SITE_KEY_DEPRECATED
 
 /**
  * Configurable Firebase options, mirroring `com.google.firebase.FirebaseOptions` from the Firebase Android SDK.
@@ -46,6 +47,9 @@ public expect class FirebaseOptions {
         public fun setProjectId(projectId: String?): Builder
         public fun setStorageBucket(storageBucket: String?): Builder
         public fun setGaTrackingId(gaTrackingId: String?): Builder
+
+        @Deprecated(RECAPTCHA_SITE_KEY_DEPRECATED)
+        public fun setRecaptchaSiteKey(recaptchaSiteKey: String?): Builder
         public fun build(): FirebaseOptions
     }
 
