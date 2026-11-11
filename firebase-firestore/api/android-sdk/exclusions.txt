@@ -38,6 +38,9 @@ com.google.firebase.firestore.DocumentReference#getFullPath  // @hide restricted
 
 # The pipeline API's protobuf-typed members (com.google.firestore.v1.Value is the Android SDK's wire type) and the
 # members the SDK compiles as Kotlin-internal (metalava lists them as public, the bytecode mangles them).
+# The Value stand-in (commonMain/kotlin/com/google/firestore/v1/Value.kt) is the one stand-in with a conceivable clash off the JVM: a project
+# generating Firestore's protos for Kotlin Multiplatform (Wire, pbandk) would declare the same class; drop the stand-in and these three
+# declarations if that ever matters.
 com.google.firebase.firestore.pipeline.AbstractOptions#with(String, NonExistentClass)  // @platform com.google.firestore.v1.Value
 com.google.firebase.firestore.pipeline.Stage#withOption(String, NonExistentClass)  // @platform com.google.firestore.v1.Value
 com.google.firebase.firestore.pipeline.Ordering.Direction#getProto  // @platform com.google.firestore.v1.Value
